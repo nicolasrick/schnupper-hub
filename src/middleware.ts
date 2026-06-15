@@ -7,6 +7,18 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const authed = req.cookies.get(AUTH_COOKIE)?.value === ADMIN_TOKEN;
 
+  // Zugangscode-Gate für die Teilnehmer-Startseite (nur wenn ZUGANGSCODE gesetzt).
+  // Verhindert, dass die URL einfach weitergegeben wird.
+  const zugangscode = process.env.ZUGANGSCODE || "";
+  if (zugangscode && pathname === "/") {
+    const hatZugang = req.cookies.get("sh_access")?.value === zugangscode;
+    if (!hatZugang) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/zugang";
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (pathname.startsWith("/admin")) {
     if (pathname.startsWith("/admin/login")) return NextResponse.next();
     if (!authed) {
@@ -35,5 +47,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*"],
 };
