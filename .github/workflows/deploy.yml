@@ -1,0 +1,20 @@
+name: Deploy zu Coolify
+
+# Bei jedem Push auf main deployt Coolify automatisch neu.
+# So braucht es nie wieder einen manuellen Token – der Token liegt
+# verschlüsselt als GitHub-Secret COOLIFY_TOKEN.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coolify-Deploy auslösen
+        run: |
+          curl -fsSL -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            "https://panel.rick.media/api/v1/deploy?uuid=b10fga1t4ay4htvdbagzmjgm"
