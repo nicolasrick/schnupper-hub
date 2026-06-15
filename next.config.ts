@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Schlankes Self-Hosting-Image (für Coolify/Docker)
+  output: "standalone",
 };
 
 export default nextConfig;

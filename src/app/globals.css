@@ -1,26 +1,123 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Offizielle Corporate Identity der Stadt St. Gallen: Rot + Schwarz,
+     neutrale Sand-/Grautöne als Zusatzfarben. (Quelle: Frontify-Markenportal)
+     Hinweis: Die Token heissen aus historischen Gründen noch "green*", halten
+     jetzt aber die CI-Rot-Palette – Klassennamen bleiben stabil. */
+  --bg: #1a1617;
+  --bg-soft: #0f0c0d;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --ink-soft: #555555;
+  --line: #ddddddff;
+  --green: #e00025;        /* CI-Rot (PMS 485) – Primärfarbe */
+  --green-dark: #a00014;   /* dunkles Rot – Hover/Tiefe */
+  --green-soft: #fbe7ea;   /* zartes Rot – Soft-Hintergründe */
+  --accent: #ff2828;       /* helles Rot – Akzent */
+  --amber: #d98a00;        /* Gold-Ton (CI #F3C167 abgedunkelt für Lesbarkeit) */
+  --sg-green: #e00025;     /* CI-Rot für Dokumente (Bestätigung/Bewertung) */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-green: var(--green);
+  --color-green-dark: var(--green-dark);
+  --color-green-soft: var(--green-soft);
+  --color-accent: var(--accent);
+  --color-amber: var(--amber);
+  --color-sg-green: var(--sg-green);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { color-scheme: light; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* Schwarz-Basis mit dezentem CI-Rot-Schimmer – Stadt St. Gallen */
+  background:
+    radial-gradient(1100px 700px at 50% -10%, #4a0e16 0%, transparent 60%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 100%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-in { animation: fadeUp 0.4s ease both; }
+
+/* --- Motion-Layer (Wow, dezent-premium) ------------------------------------ */
+
+/* Driftender CI-Rot-Schimmer über dem dunklen Grund – bringt Leben rein */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(620px 440px at 24% 16%, rgba(224, 0, 37, 0.18), transparent 60%),
+    radial-gradient(560px 420px at 82% 78%, rgba(224, 0, 37, 0.12), transparent 60%);
+  animation: drift 20s ease-in-out infinite;
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3%, 2%); }
+}
+
+@keyframes pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop-in { animation: pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+
+/* Karten, die beim Hover leicht anheben + rot glühen */
+.card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 44px -14px rgba(224, 0, 37, 0.5);
+}
+
+/* Konfetti-Stück */
+@keyframes confettiFall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(96vh) rotate(720deg); opacity: 0; }
+}
+.confetti-pc {
+  position: fixed;
+  top: 0;
+  z-index: 60;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: confettiFall linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+  .confetti-pc { display: none; }
+}
+
+/* --- Druck: nur das Bestätigungs-Dokument drucken ------------------------- */
+@media print {
+  body { background: #fff !important; }
+  body * { visibility: hidden; }
+  .print-doc, .print-doc * { visibility: visible; }
+  .print-doc {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .no-print { display: none !important; }
 }
