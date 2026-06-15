@@ -65,7 +65,7 @@ export function Hub({ onNavigate }: { onNavigate: (z: HubZiel) => void }) {
           {modus.emoji} {modus.label} · Plattformentwicklung
         </p>
         <h1 className="mt-2 text-4xl font-bold leading-tight text-white sm:text-5xl">
-          Willkommen am Schnuppertag <span className="inline-block">👋</span>
+          {modus.begruessung}
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-base text-white/70 sm:text-lg">
           {modus.intro}

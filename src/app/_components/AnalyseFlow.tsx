@@ -6,10 +6,9 @@ import { Start } from "./Start";
 import { Selbsttest } from "./Selbsttest";
 import { FitProfil } from "./FitProfil";
 import { MiniAufgaben, AufgabenErgebnis } from "./MiniAufgaben";
-import { DasErwartetDich } from "./DasErwartetDich";
 import { Abschluss } from "./Abschluss";
 
-type Schritt = "start" | "test" | "profil" | "aufgaben" | "erwartet" | "abschluss";
+type Schritt = "start" | "test" | "profil" | "aufgaben" | "abschluss";
 
 /** Die geführte Berufswahl-Analyse. DATENARM: alles bleibt lokal in der
  *  Browser-Session – es wird nichts zum Server geschickt. */
@@ -37,10 +36,8 @@ export function AnalyseFlow({ onExit }: { onExit: () => void }) {
       )}
 
       {schritt === "aufgaben" && (
-        <MiniAufgaben onDone={(e) => { setAufgaben(e); setSchritt("erwartet"); }} />
+        <MiniAufgaben onDone={(e) => { setAufgaben(e); setSchritt("abschluss"); }} />
       )}
-
-      {schritt === "erwartet" && <DasErwartetDich onNext={() => setSchritt("abschluss")} />}
 
       {schritt === "abschluss" && auswertung && aufgaben && (
         <Abschluss name={name} auswertung={auswertung} aufgaben={aufgaben} onRestart={onExit} />

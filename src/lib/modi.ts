@@ -13,7 +13,9 @@ export interface Modus {
   label: string;
   emoji: string;
   dauer: string;
-  /** Begrüssungstext im Hero */
+  /** Begrüssung (Titel) im Hero – passt sich dem Anlass an */
+  begruessung: string;
+  /** Untertitel im Hero */
   intro: string;
   /** Welche Hub-Karten in diesem Modus sichtbar sind */
   karten: HubZiel[];
@@ -29,8 +31,9 @@ export const MODI: Modus[] = [
     label: "Schnuppertag",
     emoji: "🗓️",
     dauer: "2 Tage",
-    intro: "Deine Einsatzzentrale für die zwei Tage – alles, was du brauchst, jederzeit und von jedem Laptop.",
-    karten: ["analyse", "mission", "aufgaben", "zeitplan", "abgabe"],
+    begruessung: "Willkommen am Schnuppertag 👋",
+    intro: "Hier arbeitest du: Analyse, Mission und die Aufgaben. Alles, was du selbst löst und ausprobierst.",
+    karten: ["analyse", "mission", "aufgaben", "abgabe"],
     analyseDauer: "ca. 10 Min",
   },
   {
@@ -38,7 +41,8 @@ export const MODI: Modus[] = [
     label: "Schul-Nachmittag",
     emoji: "🏫",
     dauer: "ca. 2–3 Std.",
-    intro: "Willkommen zu eurem IT-Nachmittag bei den IDS – schaut rein, probiert aus, fragt alles.",
+    begruessung: "Willkommen zu eurem IT-Nachmittag 👋",
+    intro: "Hier arbeitest du: Analyse, Mission und die Aufgaben – ausprobieren und selbst lösen.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
     analyseDauer: "ca. 10 Min",
   },
@@ -47,7 +51,8 @@ export const MODI: Modus[] = [
     label: "Zukunftstag",
     emoji: "🚀",
     dauer: "ca. 2 Std.",
-    intro: "Schön, dass du heute die IT der Stadt entdeckst – tauch ein in echte IT-Arbeit!",
+    begruessung: "Willkommen am Zukunftstag 👋",
+    intro: "Hier entdeckst du echte IT-Arbeit: dein Profil, die Mission und die Aufgaben zum Selbermachen.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
     analyseDauer: "ca. 10 Min",
     hinweis: "Für junge Entdecker:innen am Zukunftstag.",
@@ -57,7 +62,8 @@ export const MODI: Modus[] = [
     label: "Triebwerk",
     emoji: "⚙️",
     dauer: "ca. 2–3 Std.",
-    intro: "IT zum Anfassen – euer Workshop im Triebwerk. Los geht's mit deinem eigenen Profil.",
+    begruessung: "Willkommen im Triebwerk 👋",
+    intro: "IT zum Anfassen: dein Profil, die Mission und die Aufgaben – selbst ausprobieren und lösen.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
     analyseDauer: "ca. 10 Min",
   },
