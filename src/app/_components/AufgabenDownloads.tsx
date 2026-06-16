@@ -5,7 +5,7 @@ import { AUFGABEN, DOWNLOADS, Aufgabe, AufgabeTool, Download } from "@/lib/conte
 import { Card, BackBar } from "./ui";
 
 const TOOL_LABEL: Record<AufgabeTool, string> = {
-  OnlyOffice: "Office im Browser",
+  OnlyOffice: "Office 2016",
   Browser: "Browser",
   PowerShell: "PowerShell ISE",
   Scratch: "Scratch",
@@ -79,13 +79,6 @@ function AufgabeCard({ a }: { a: Aufgabe }) {
             </div>
           )}
 
-          {a.tool === "OnlyOffice" && (
-            <p className="rounded-2xl bg-green-soft px-4 py-3 text-sm text-green-dark">
-              💡 Diese Aufgabe läuft im Browser-Office (OnlyOffice) – keine Word/Excel-Lizenz nötig.
-              <span className="text-green-dark/70"> (Einbindung folgt, sobald der Server steht.)</span>
-            </p>
-          )}
-
           {a.downloads.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {a.downloads.map((f) => <DownloadButton key={f} file={f} />)}
@@ -126,8 +119,7 @@ export function AufgabenDownloads({ onBack }: { onBack: () => void }) {
       </div>
 
       <p className="mt-6 rounded-2xl bg-white/10 px-4 py-3 text-sm text-white/70">
-        🗂️ Lade dir die Gerüst-Dateien selbst herunter – kein Verteilen auf 16 Geräten nötig.
-        {tag === 1 ? " Tag 1 ist vor allem Hands-on." : ""}
+        🗂️ Lade dir hier die Dateien herunter, die du für die Aufgaben brauchst.
       </p>
     </div>
   );

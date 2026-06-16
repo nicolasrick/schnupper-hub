@@ -350,11 +350,11 @@ export const AUFGABEN: Aufgabe[] = [
     id: "t1-doku", tag: 1, emoji: "📄", titel: "Dokumentformatierung", tool: "OnlyOffice",
     ziel: "Formatiere ein unsauberes Dokument sauber – wie im IT-Alltag, wenn andere darauf weiterarbeiten.",
     schritte: [
-      "Lade das Übungsdokument herunter und öffne es im Office (OnlyOffice im Browser).",
+      "Lade das Übungsdokument herunter und öffne es in Office 2016 (Word) auf dem PC.",
       "Setze Überschriften, Absätze und einheitliche Schrift.",
       "Speichere als «Vorname_Nachname».",
     ],
-    hinweise: ["Kein lokales Word nötig – läuft im Browser.", "Sauberkeit zählt mehr als Tempo."],
+    hinweise: ["Word ist auf dem Gerät installiert (Office 2016).", "Sauberkeit zählt mehr als Tempo."],
     downloads: ["uebung-dokument.docx"],
   },
   {
@@ -410,7 +410,7 @@ export const AUFGABEN: Aufgabe[] = [
       "Sicherstellen, dass alle Teile kompatibel sind (v. a. GPU/CPU).",
       "Erstelle eine Excel-Tabelle mit deinen Komponenten (evtl. mit Bildern).",
     ],
-    hinweise: ["Nutze digitec.ch, brack.ch, toppreise.ch.", "Tabelle läuft im Browser (OnlyOffice) – keine Excel-Lizenz nötig."],
+    hinweise: ["Nutze digitec.ch, brack.ch, toppreise.ch.", "Erstelle die Tabelle in Excel (Office 2016 auf dem PC)."],
     downloads: ["gaming-pc-vorlage.xlsx"],
   },
   {

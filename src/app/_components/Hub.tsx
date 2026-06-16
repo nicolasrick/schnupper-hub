@@ -27,7 +27,7 @@ const KARTEN: Record<HubZiel, { emoji: string; titel: string; text: string; cta:
   },
   abgabe: {
     emoji: "📤", titel: "Dateien abgeben", cta: "Hochladen",
-    text: "Lade deine Arbeiten hoch – dein:e Berufsbildner:in schaut sie sich an.",
+    text: "Lade hoch, was du erstellt hast – damit deine Arbeit nicht verloren geht.",
   },
 };
 
