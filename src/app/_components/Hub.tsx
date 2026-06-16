@@ -31,12 +31,6 @@ const KARTEN: Record<HubZiel, { emoji: string; titel: string; text: string; cta:
   },
 };
 
-const FAKTEN = [
-  { emoji: "🛠️", text: "Echtes Hands-on" },
-  { emoji: "🎯", text: "Dein eigenes Fit-Profil" },
-  { emoji: "🚀", text: "Bald: Team-Mission" },
-];
-
 export function Hub({ onNavigate }: { onNavigate: (z: HubZiel) => void }) {
   const [modusId, setModusId] = useState(STANDARD_MODUS);
 
@@ -108,21 +102,8 @@ export function Hub({ onNavigate }: { onNavigate: (z: HubZiel) => void }) {
         ))}
       </div>
 
-      {/* Fakten-Leiste */}
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        {FAKTEN.map((f) => (
-          <span
-            key={f.text}
-            className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white/80 ring-1 ring-white/10"
-          >
-            <span>{f.emoji}</span>
-            {f.text}
-          </span>
-        ))}
-      </div>
-
       <p className="mt-10 text-center text-sm text-white/40">
-        Informatikdienste der Stadt St. Gallen · Schnuppertage · Prototyp
+        Informatikdienste der Stadt St.&nbsp;Gallen · Schnuppertage
       </p>
     </div>
   );
