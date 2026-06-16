@@ -32,9 +32,9 @@ export const MODI: Modus[] = [
     emoji: "🗓️",
     dauer: "2 Tage",
     begruessung: "Willkommen am Schnuppertag 👋",
-    intro: "Hier findest du alles an einem Ort: Analyse, Mission und die Aufgaben. Wann was dran ist, sagen wir dir – das Lösen und Ausprobieren ist dann deine Sache.",
+    intro: "Hier findest du alles an einem Ort: Analyse, Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
-    analyseDauer: "ca. 10 Min",
+    analyseDauer: "ca. 25 Min",
   },
   {
     id: "nachmittag",
@@ -42,9 +42,9 @@ export const MODI: Modus[] = [
     emoji: "🏫",
     dauer: "ca. 2–3 Std.",
     begruessung: "Willkommen zu eurem IT-Nachmittag 👋",
-    intro: "Alles an einem Ort: Analyse, Mission und die Aufgaben. Wann was dran ist, geben wir vor – Ausprobieren und Lösen ist deine Sache.",
+    intro: "Alles an einem Ort: Analyse, Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
-    analyseDauer: "ca. 10 Min",
+    analyseDauer: "ca. 25 Min",
   },
   {
     id: "zukunftstag",
@@ -52,9 +52,9 @@ export const MODI: Modus[] = [
     emoji: "🚀",
     dauer: "ca. 2 Std.",
     begruessung: "Willkommen am Zukunftstag 👋",
-    intro: "Hier entdeckst du echte IT-Arbeit: dein Profil, die Mission und die Aufgaben. Wir führen dich durch – mitmachen und ausprobieren ist dein Part.",
+    intro: "Hier entdeckst du echte IT-Arbeit: dein Profil, die Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
-    analyseDauer: "ca. 10 Min",
+    analyseDauer: "ca. 25 Min",
     hinweis: "Für junge Entdecker:innen am Zukunftstag.",
   },
   {
@@ -63,9 +63,9 @@ export const MODI: Modus[] = [
     emoji: "⚙️",
     dauer: "ca. 2–3 Std.",
     begruessung: "Willkommen im Triebwerk 👋",
-    intro: "IT zum Anfassen: dein Profil, die Mission und die Aufgaben. Wir sagen, was dran ist – selbst ausprobieren und lösen ist dein Part.",
+    intro: "IT zum Anfassen: dein Profil, die Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe"],
-    analyseDauer: "ca. 10 Min",
+    analyseDauer: "ca. 25 Min",
   },
 ];
 
