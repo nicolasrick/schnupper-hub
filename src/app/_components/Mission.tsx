@@ -206,7 +206,7 @@ function MatchingView({ e, onSolve }: { e: EinsatzMatching; onSolve: (p: number)
         <>
           <Fragment frag={e.fragment} />
           <div className="mt-5 flex justify-end">
-            <Button onClick={() => onSolve(punkteFuer(fehler))}>Stadt wieder online →</Button>
+            <Button onClick={() => onSolve(punkteFuer(fehler))}>Weiter →</Button>
           </div>
         </>
       )}
