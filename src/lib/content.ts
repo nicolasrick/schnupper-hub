@@ -593,7 +593,7 @@ export const CHECK_ITEMS: CheckItem[] = [
   },
   {
     id: "err1", teil: "Wie ein Computer denkt", typ: "fehler",
-    intro: "Ein kleines Skript soll drei Server der Reihe nach anpingen.",
+    intro: "Mit dem Befehl «ping» prüft man, ob ein Gerät im Netzwerk erreichbar ist – jedes Gerät hat dafür eine Adresse (IP) aus vier Zahlen. Dieses Skript pingt drei Geräte der Reihe nach an.",
     frage: "Welche Zeile kann unmöglich funktionieren?",
     zeilen: [
       { text: "ping 192.168.0.1", defekt: false },

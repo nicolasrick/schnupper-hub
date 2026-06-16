@@ -155,7 +155,7 @@ const PLAYLIST_VOLL: Playlist = {
     e("quizBinaer", "E"),
     e("matchingFeuerwehr", "U"),
     beat("📟", "Die Lage spitzt sich zu",
-      "Während du arbeitest, fallen weitere Systeme aus: das Bürgeramt, die Ampeln am Bahnhof. Im ServiceDesk wird es laut. Jetzt wird's kniffliger – bleib ruhig und denk mit."),
+      "Während du arbeitest, fallen weitere Stellen aus: die St.Galler Stadtwerke, dann das Tiefbauamt. Im ServiceDesk wird es laut. Jetzt wird's kniffliger – bleib ruhig und denk mit."),
     e("cipherServer", "S"),
     e("codeServer", "T"),
     e("binaerBuchstabe", "A"),

@@ -98,8 +98,6 @@ export function Mission({ onBack }: { onBack: () => void }) {
 /* ---------- Intro (mit Solo/Team-Wahl) ---------- */
 function Intro({ modusId, onStart }: { modusId: string | null; onStart: (t: TeamInfo) => void }) {
   const kurz = modusId === "zukunftstag";
-  const [team, setTeam] = useState(false);
-  const [name, setName] = useState("");
   return (
     <Card className="p-8 text-center sm:p-10">
       <div className="text-5xl">🚨</div>
@@ -107,34 +105,9 @@ function Intro({ modusId, onStart }: { modusId: string | null; onStart: (t: Team
       <h2 className="mt-1 text-3xl font-bold sm:text-4xl">{MISSION_STORY.titel}</h2>
       <p className="mx-auto mt-4 max-w-lg leading-relaxed text-ink-soft">{MISSION_STORY.intro}</p>
 
-      <div className="mx-auto mt-7 max-w-sm text-left">
-        <p className="mb-2 text-center text-sm font-semibold text-ink">Wie spielst du?</p>
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => setTeam(false)}
-            className={"rounded-2xl border-2 px-4 py-3 text-center transition " + (!team ? "border-green bg-green-soft" : "border-line bg-white hover:border-green/40")}>
-            <div className="text-xl">🧑‍💻</div>
-            <div className="mt-1 text-sm font-semibold">Solo</div>
-          </button>
-          <button onClick={() => setTeam(true)}
-            className={"rounded-2xl border-2 px-4 py-3 text-center transition " + (team ? "border-green bg-green-soft" : "border-line bg-white hover:border-green/40")}>
-            <div className="text-xl">👥</div>
-            <div className="mt-1 text-sm font-semibold">Team (2–3)</div>
-          </button>
-        </div>
-        {team && (
-          <input
-            value={name}
-            onChange={(ev) => setName(ev.target.value)}
-            placeholder="Team-Name (optional)"
-            maxLength={24}
-            className="mt-3 w-full rounded-2xl border border-line px-4 py-2.5 text-sm outline-none focus:border-green focus:ring-4 focus:ring-green/20"
-          />
-        )}
-      </div>
-
-      <p className="mt-4 text-xs text-ink-soft">{kurz ? "Kurz-Einsatz · ca. 10 Min" : "Voll-Einsatz · 8 Aufträge"}</p>
+      <p className="mt-6 text-xs text-ink-soft">{kurz ? "Kurz-Einsatz · ca. 10 Min" : "Voll-Einsatz · 8 Aufträge"}</p>
       <div className="mt-6 flex justify-center">
-        <Button onClick={() => onStart({ team, name: name.trim() })}>Einsatz starten →</Button>
+        <Button onClick={() => onStart({ team: false, name: "" })}>Einsatz starten →</Button>
       </div>
     </Card>
   );
