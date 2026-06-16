@@ -29,6 +29,10 @@ const KARTEN: Record<HubZiel, { emoji: string; titel: string; text: string; cta:
     emoji: "📤", titel: "Dateien abgeben", cta: "Hochladen",
     text: "Lade hoch, was du erstellt hast – damit deine Arbeit nicht verloren geht.",
   },
+  infos: {
+    emoji: "📲", titel: "Infos & Bewerbung", cta: "QR-Code öffnen",
+    text: "Alles zur Lehre und wie du dich bewirbst – mit dem Handy scannen und mitnehmen.",
+  },
 };
 
 export function Hub({ onNavigate }: { onNavigate: (z: HubZiel) => void }) {

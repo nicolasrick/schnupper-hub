@@ -7,6 +7,7 @@ import { Zeitplan } from "./_components/Zeitplan";
 import { AufgabenDownloads } from "./_components/AufgabenDownloads";
 import { Abgabe } from "./_components/Abgabe";
 import { Mission } from "./_components/Mission";
+import { Infos } from "./_components/Infos";
 
 type View = "hub" | HubZiel;
 
@@ -22,6 +23,7 @@ export default function Home() {
       {view === "aufgaben" && <AufgabenDownloads onBack={zumHub} />}
       {view === "abgabe" && <Abgabe onBack={zumHub} />}
       {view === "mission" && <Mission onBack={zumHub} />}
+      {view === "infos" && <Infos onBack={zumHub} />}
     </main>
   );
 }

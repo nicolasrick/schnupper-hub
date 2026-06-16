@@ -6,7 +6,7 @@
 //  gesteuert für die Jugendlichen – keine manuelle Schritt-für-Schritt-Steuerung.
 // =============================================================================
 
-export type HubZiel = "analyse" | "mission" | "zeitplan" | "aufgaben" | "abgabe";
+export type HubZiel = "analyse" | "mission" | "zeitplan" | "aufgaben" | "abgabe" | "infos";
 
 export interface Modus {
   id: string;
@@ -33,7 +33,7 @@ export const MODI: Modus[] = [
     dauer: "2 Tage",
     begruessung: "Willkommen am Schnuppertag 👋",
     intro: "Hier findest du alles an einem Ort: Analyse, Mission und die Aufgaben.",
-    karten: ["analyse", "mission", "aufgaben", "abgabe"],
+    karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
     analyseDauer: "ca. 25 Min",
   },
   {
@@ -43,7 +43,7 @@ export const MODI: Modus[] = [
     dauer: "ca. 2–3 Std.",
     begruessung: "Willkommen zu eurem IT-Nachmittag 👋",
     intro: "Alles an einem Ort: Analyse, Mission und die Aufgaben.",
-    karten: ["analyse", "mission", "aufgaben", "abgabe"],
+    karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
     analyseDauer: "ca. 25 Min",
   },
   {
@@ -53,7 +53,7 @@ export const MODI: Modus[] = [
     dauer: "ca. 2 Std.",
     begruessung: "Willkommen am Zukunftstag 👋",
     intro: "Hier entdeckst du echte IT-Arbeit: dein Profil, die Mission und die Aufgaben.",
-    karten: ["analyse", "mission", "aufgaben", "abgabe"],
+    karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
     analyseDauer: "ca. 25 Min",
     hinweis: "Für junge Entdecker:innen am Zukunftstag.",
   },
@@ -64,7 +64,7 @@ export const MODI: Modus[] = [
     dauer: "ca. 2–3 Std.",
     begruessung: "Willkommen im Triebwerk 👋",
     intro: "IT zum Anfassen: dein Profil, die Mission und die Aufgaben.",
-    karten: ["analyse", "mission", "aufgaben", "abgabe"],
+    karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
     analyseDauer: "ca. 25 Min",
   },
 ];
