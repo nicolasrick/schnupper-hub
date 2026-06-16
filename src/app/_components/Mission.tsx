@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   MISSION_STORY, EINSAETZE, BIT_WERTE, MASTER_CODE, MAX_PUNKTE,
-  punkteFuer, rangFuer, EinsatzTriage, EinsatzBinaer, EinsatzMatching,
+  punkteFuer, rangFuer, EinsatzTriage, EinsatzQuiz, EinsatzBinaer, EinsatzCode, EinsatzMatching,
 } from "@/lib/mission";
 import { Card, Button, BackBar, StepDots } from "./ui";
 import { Confetti } from "./Confetti";
@@ -33,17 +33,14 @@ export function Mission({ onBack }: { onBack: () => void }) {
 
       {schritt === 0 && <Intro onStart={() => setSchritt(1)} />}
 
-      {EINSAETZE.map((e, i) =>
-        schritt === i + 1 ? (
-          e.typ === "triage" ? (
-            <TriageView key={e.nr} e={e} onSolve={loese} />
-          ) : e.typ === "binaer" ? (
-            <BinaerView key={e.nr} e={e} onSolve={loese} />
-          ) : (
-            <MatchingView key={e.nr} e={e} onSolve={loese} />
-          )
-        ) : null
-      )}
+      {EINSAETZE.map((e, i) => {
+        if (schritt !== i + 1) return null;
+        if (e.typ === "triage") return <TriageView key={e.nr} e={e} onSolve={loese} />;
+        if (e.typ === "quiz") return <QuizView key={e.nr} e={e} onSolve={loese} />;
+        if (e.typ === "binaer") return <BinaerView key={e.nr} e={e} onSolve={loese} />;
+        if (e.typ === "code") return <CodeView key={e.nr} e={e} onSolve={loese} />;
+        return <MatchingView key={e.nr} e={e} onSolve={loese} />;
+      })}
 
       {schritt === total + 1 && <Finale punkte={punkte} onBack={onBack} />}
     </div>
@@ -213,6 +210,84 @@ function MatchingView({ e, onSolve }: { e: EinsatzMatching; onSolve: (p: number)
           </div>
         </>
       )}
+    </Card>
+  );
+}
+
+/* ---------- Quiz (Multiple Choice) ---------- */
+function QuizView({ e, onSolve }: { e: EinsatzQuiz; onSolve: (p: number) => void }) {
+  const [gewaehlt, setGewaehlt] = useState<number | null>(null);
+  const [fehler, setFehler] = useState(0);
+  const geloest = gewaehlt !== null && e.optionen[gewaehlt].richtig;
+
+  function waehle(i: number) {
+    if (geloest) return;
+    setGewaehlt(i);
+    if (!e.optionen[i].richtig) setFehler((f) => f + 1);
+  }
+
+  return (
+    <Card className="p-8 sm:p-10">
+      <p className="text-sm font-semibold uppercase tracking-wide text-green">Einsatz {e.nr} · {e.titel}</p>
+      <p className="mt-3 rounded-2xl bg-black/5 px-4 py-3 font-medium">{e.intro}</p>
+      <h2 className="mt-4 text-2xl font-bold">{e.frage}</h2>
+      <div className="mt-5 grid gap-3">
+        {e.optionen.map((o, i) => {
+          const sel = gewaehlt === i;
+          let cls = "border-line bg-white hover:border-green/50 hover:bg-green-soft/40";
+          if (sel && o.richtig) cls = "border-green bg-green-soft";
+          else if (sel && !o.richtig) cls = "border-amber bg-amber/10";
+          return (
+            <button key={i} onClick={() => waehle(i)} disabled={geloest}
+              className={"rounded-2xl border px-5 py-4 text-left text-base font-medium transition disabled:cursor-default " + cls}>
+              {o.text}
+            </button>
+          );
+        })}
+      </div>
+      {geloest && <p className="mt-4 rounded-2xl bg-green-soft px-4 py-3 text-sm leading-relaxed text-green-dark">✅ {e.aufloesung}</p>}
+      {gewaehlt !== null && !geloest && <p className="mt-4 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-amber">Nicht ganz – probier nochmal.</p>}
+      {geloest && (
+        <>
+          <Fragment frag={e.fragment} />
+          <div className="mt-5 flex justify-end"><Button onClick={() => onSolve(punkteFuer(fehler))}>Weiter →</Button></div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+/* ---------- Datei finden (Code eingeben) ---------- */
+function CodeView({ e, onSolve }: { e: EinsatzCode; onSolve: (p: number) => void }) {
+  const [wert, setWert] = useState("");
+  const [status, setStatus] = useState<"offen" | "richtig" | "falsch">("offen");
+  const [fehler, setFehler] = useState(0);
+
+  function pruefen() {
+    const v = wert.trim().toLowerCase();
+    if (v.length > 0 && e.loesung.some((l) => l.toLowerCase() === v)) setStatus("richtig");
+    else { setStatus("falsch"); setFehler((f) => f + 1); }
+  }
+
+  return (
+    <Card className="p-8 sm:p-10">
+      <p className="text-sm font-semibold uppercase tracking-wide text-green">Einsatz {e.nr} · {e.titel}</p>
+      <p className="mt-3 rounded-2xl bg-black/5 px-4 py-3 font-medium">{e.intro}</p>
+      <h2 className="mt-4 text-2xl font-bold leading-snug">{e.frage}</h2>
+      <input
+        value={wert}
+        onChange={(ev) => { setWert(ev.target.value); setStatus("offen"); }}
+        placeholder="Codewort eingeben"
+        disabled={status === "richtig"}
+        className="mt-5 w-full rounded-2xl border border-line px-5 py-3 text-lg outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+      />
+      {status === "falsch" && <p className="mt-3 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-amber">Noch nicht gefunden. Tipp: {e.hinweis}</p>}
+      {status === "richtig" && <Fragment frag={e.fragment} />}
+      <div className="mt-5 flex justify-end">
+        {status === "richtig"
+          ? <Button onClick={() => onSolve(punkteFuer(fehler))}>Weiter →</Button>
+          : <Button onClick={pruefen} disabled={wert.trim().length === 0}>Prüfen</Button>}
+      </div>
     </Card>
   );
 }

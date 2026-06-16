@@ -10,16 +10,16 @@ export type { HubZiel } from "@/lib/modi";
 const KARTEN: Record<HubZiel, { emoji: string; titel: string; text: string; cta: string; primary?: boolean }> = {
   analyse: {
     emoji: "🧭", titel: "Berufswahl-Analyse", cta: "Analyse starten",
-    text: "Selbsttest, Mini-Aufgaben und ein ehrlicher Blick: Passt Plattformentwicklung zu dir?",
+    text: "Ein paar Fragen und kleine Aufgaben. Am Ende siehst du, wie gut der Beruf zu dir passt.",
     primary: true,
   },
   mission: {
     emoji: "🚨", titel: "Mission: Einsatz IDS", cta: "Mission starten",
-    text: "Die Stadt-IT ist ausgefallen! Löse die Einsätze, knacke den Code – und sichere dir deinen Rang.",
+    text: "Die Stadt-IT ist ausgefallen. Löse die Einsätze und bring sie wieder zum Laufen.",
   },
   aufgaben: {
     emoji: "🗂️", titel: "Aufgaben & Downloads", cta: "Öffnen",
-    text: "Alle Anleitungen und die Dateien zum Herunterladen – jederzeit griffbereit.",
+    text: "Die Anleitungen und Dateien zu den Aufgaben – hier zum Herunterladen.",
   },
   zeitplan: {
     emoji: "🕐", titel: "Zeitplan", cta: "Öffnen",

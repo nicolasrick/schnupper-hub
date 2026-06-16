@@ -30,9 +30,9 @@ export function Start({ onStart, onBack }: { onStart: (name: string) => void; on
           Passt die Lehre als <span className="text-green">Plattform&shy;entwickler/in</span> zu dir?
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-          In rund 10 Minuten findest du es heraus: ein kurzer Selbsttest, ein
-          paar knifflige Mini-Aufgaben aus unserem Alltag – und ein ehrlicher
-          Blick darauf, was dich in der Lehre wirklich erwartet.
+          Beantworte ein paar Fragen und löse kleine Aufgaben aus unserem
+          Alltag. Am Ende siehst du, wie gut der Beruf zu dir passt. Dauert
+          etwa 10 Minuten.
         </p>
 
         <form onSubmit={submit} className="mt-8">
