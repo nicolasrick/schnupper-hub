@@ -12,9 +12,11 @@ export function Mission({ onBack }: { onBack: () => void }) {
   // 0 = Intro, 1..N = Einsätze, N+1 = Finale
   const [schritt, setSchritt] = useState(0);
   const [punkte, setPunkte] = useState(0);
+  const [fragmente, setFragmente] = useState<string[]>([]);
 
-  function loese(p: number) {
+  function loese(p: number, fragment: string) {
     setPunkte((x) => x + p);
+    setFragmente((f) => [...f, fragment]);
     setSchritt((s) => s + 1);
   }
 
@@ -35,14 +37,17 @@ export function Mission({ onBack }: { onBack: () => void }) {
 
       {EINSAETZE.map((e, i) => {
         if (schritt !== i + 1) return null;
-        if (e.typ === "triage") return <TriageView key={e.nr} e={e} onSolve={loese} />;
-        if (e.typ === "quiz") return <QuizView key={e.nr} e={e} onSolve={loese} />;
-        if (e.typ === "binaer") return <BinaerView key={e.nr} e={e} onSolve={loese} />;
-        if (e.typ === "code") return <CodeView key={e.nr} e={e} onSolve={loese} />;
-        return <MatchingView key={e.nr} e={e} onSolve={loese} />;
+        const solve = (p: number) => loese(p, e.fragment);
+        if (e.typ === "triage") return <TriageView key={e.nr} e={e} onSolve={solve} />;
+        if (e.typ === "quiz") return <QuizView key={e.nr} e={e} onSolve={solve} />;
+        if (e.typ === "binaer") return <BinaerView key={e.nr} e={e} onSolve={solve} />;
+        if (e.typ === "code") return <CodeView key={e.nr} e={e} onSolve={solve} />;
+        return <MatchingView key={e.nr} e={e} onSolve={solve} />;
       })}
 
-      {schritt === total + 1 && <Finale punkte={punkte} onBack={onBack} />}
+      {schritt === total + 1 && <MasterCode fragmente={fragmente} onDone={() => setSchritt(total + 2)} />}
+
+      {schritt === total + 2 && <Finale punkte={punkte} onBack={onBack} />}
     </div>
   );
 }
@@ -287,6 +292,50 @@ function CodeView({ e, onSolve }: { e: EinsatzCode; onSolve: (p: number) => void
         {status === "richtig"
           ? <Button onClick={() => onSolve(punkteFuer(fehler))}>Weiter →</Button>
           : <Button onClick={pruefen} disabled={wert.trim().length === 0}>Prüfen</Button>}
+      </div>
+    </Card>
+  );
+}
+
+/* ---------- Master-Code zusammensetzen ---------- */
+function MasterCode({ fragmente, onDone }: { fragmente: string[]; onDone: () => void }) {
+  const [wert, setWert] = useState("");
+  const [falsch, setFalsch] = useState(0);
+
+  function pruefen() {
+    if (wert.trim().toUpperCase() === MASTER_CODE) onDone();
+    else setFalsch((f) => f + 1);
+  }
+
+  return (
+    <Card className="p-8 text-center sm:p-10">
+      <div className="text-4xl">🧩</div>
+      <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Setz den Master-Code zusammen</h2>
+      <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
+        Du hast aus jedem Einsatz ein Code-Fragment. Setz sie in der richtigen
+        Reihenfolge zusammen und gib den Master-Code ein – damit fährst du die
+        Systeme der Stadt wieder hoch.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        {fragmente.map((f, i) => (
+          <span key={i} className="grid h-12 w-12 place-items-center rounded-xl border-2 border-green bg-green-soft text-2xl font-bold text-green-dark">
+            {f}
+          </span>
+        ))}
+      </div>
+      <input
+        value={wert}
+        onChange={(e) => { setWert(e.target.value.toUpperCase()); }}
+        placeholder="MASTER-CODE"
+        className="mt-6 w-full max-w-xs rounded-2xl border border-line px-5 py-3 text-center text-xl font-bold tracking-[0.3em] outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+      />
+      {falsch > 0 && (
+        <p className="mt-3 text-sm text-amber">
+          Noch nicht. {falsch >= 2 ? "Tipp: Lies die Kacheln von links nach rechts." : "Schau die Fragmente nochmal an."}
+        </p>
+      )}
+      <div className="mt-6 flex justify-center">
+        <Button onClick={pruefen} disabled={wert.trim().length === 0}>Stadt wieder online bringen →</Button>
       </div>
     </Card>
   );
