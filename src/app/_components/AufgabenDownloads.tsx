@@ -114,13 +114,13 @@ export function AufgabenDownloads({ onBack }: { onBack: () => void }) {
         ))}
       </div>
 
+      <p className="mb-4 rounded-2xl bg-white/10 px-4 py-3 text-sm text-white/70">
+        🗂️ Lade dir hier die Dateien herunter, die du für die Aufgaben brauchst.
+      </p>
+
       <div className="space-y-3">
         {aufgaben.map((a) => <AufgabeCard key={a.id} a={a} />)}
       </div>
-
-      <p className="mt-6 rounded-2xl bg-white/10 px-4 py-3 text-sm text-white/70">
-        🗂️ Lade dir hier die Dateien herunter, die du für die Aufgaben brauchst.
-      </p>
     </div>
   );
 }

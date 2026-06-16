@@ -50,8 +50,7 @@ export function Abgabe({ onBack }: { onBack: () => void }) {
         <div className="text-4xl">📤</div>
         <h2 className="mt-3 text-2xl font-bold">Deine Arbeiten abgeben</h2>
         <p className="mt-2 leading-relaxed text-ink-soft">
-          Lade hoch, was du erstellt hast – Dokument, Tabelle, Screenshots. So
-          geht deine Arbeit nicht verloren, wenn das Gerät später zurückgesetzt wird.
+          Lade hoch, was du erstellt hast – Dokument, Tabelle oder Screenshots.
         </p>
 
         <label className="mt-6 block text-sm font-medium text-ink">Dein Name</label>

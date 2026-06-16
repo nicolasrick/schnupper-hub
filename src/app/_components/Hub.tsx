@@ -94,7 +94,7 @@ export function Hub({ onNavigate }: { onNavigate: (z: HubZiel) => void }) {
             <p className={"mt-1.5 leading-relaxed " + (k.primary ? "text-white/85" : "text-ink-soft")}>
               {k.text}
             </p>
-            <span className={"mt-4 inline-flex items-center gap-1.5 text-sm font-semibold " + (k.primary ? "text-white" : "text-green")}>
+            <span className={"mt-auto pt-4 inline-flex items-center gap-1.5 text-sm font-semibold " + (k.primary ? "text-white" : "text-green")}>
               {k.cta}
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </span>
