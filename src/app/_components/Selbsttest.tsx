@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FRAGEN, SKALA } from "@/lib/content";
-import { Card, StepDots } from "./ui";
+import { Card, Fortschritt } from "./ui";
 
 export function Selbsttest({
   name,
@@ -30,11 +30,16 @@ export function Selbsttest({
   return (
     <div className="mx-auto w-full max-w-xl">
       <Card className="p-8 sm:p-10">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-green">
-            Frage {idx + 1} von {FRAGEN.length}
-          </span>
-          <StepDots total={FRAGEN.length} current={idx} />
+        <div>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="whitespace-nowrap text-sm font-semibold text-green">
+              Frage {idx + 1} von {FRAGEN.length}
+            </span>
+            <span className="tabular-nums text-xs font-medium text-ink-soft">
+              {Math.round(((idx + 1) / FRAGEN.length) * 100)}%
+            </span>
+          </div>
+          <Fortschritt value={idx / FRAGEN.length} tone="light" />
         </div>
 
         <h2 key={frage.id} className="anim-in mt-6 text-2xl font-bold leading-snug sm:text-3xl">

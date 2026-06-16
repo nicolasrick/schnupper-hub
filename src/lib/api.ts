@@ -1,5 +1,5 @@
-// Client-Helfer für die (datenarme) Server-API: nur der zentrale Modus.
-// Personendaten werden NICHT zum Server geschickt – sie bleiben lokal.
+// Client-Helfer für die Server-API: Modus + (minimiertes) Check-Ergebnis.
+// Gespeichert wird nur Vorname + Kennzahlen, kurzlebig + auto-gelöscht.
 
 async function j<T>(url: string, opts?: RequestInit): Promise<T> {
   const r = await fetch(url, { cache: "no-store", ...opts });
@@ -16,4 +16,12 @@ export const api = {
       body: JSON.stringify({ modus }),
     }),
   logout: () => fetch("/api/login", { method: "DELETE" }),
+
+  // Check-Ergebnis (nur Vorname + Kennzahlen) an den Server – Fire-and-forget.
+  saveErgebnis: (entry: Record<string, unknown>) =>
+    fetch("/api/ergebnis", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(entry),
+    }).catch(() => {}),
 };

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { auswerten, Auswertung } from "@/lib/content";
+import { api } from "@/lib/api";
 import { Start } from "./Start";
 import { Selbsttest } from "./Selbsttest";
 import { FitProfil } from "./FitProfil";
-import { MiniAufgaben, AufgabenErgebnis } from "./MiniAufgaben";
+import { EignungsCheck, AufgabenErgebnis } from "./EignungsCheck";
 import { Abschluss } from "./Abschluss";
 
 type Schritt = "start" | "test" | "profil" | "aufgaben" | "abschluss";
@@ -36,7 +37,27 @@ export function AnalyseFlow({ onExit }: { onExit: () => void }) {
       )}
 
       {schritt === "aufgaben" && (
-        <MiniAufgaben onDone={(e) => { setAufgaben(e); setSchritt("abschluss"); }} />
+        <EignungsCheck
+          onDone={(e) => {
+            setAufgaben(e);
+            setSchritt("abschluss");
+            // Minimiertes Ergebnis an den Server (Vorname + Kennzahlen) – fürs Dashboard.
+            if (auswertung) {
+              api.saveErgebnis({
+                vorname: name,
+                passung: auswertung.passung,
+                topFeld: auswertung.staerken[0]?.dim.label ?? "",
+                selbststaendig: e.selbststaendig,
+                total: e.total,
+                tipps: e.tipps,
+                starkeTeile: e.starkeTeile,
+                bonusGemacht: e.bonusGemacht,
+                bonusSelbststaendig: e.bonusSelbststaendig,
+                bonusTotal: e.bonusTotal,
+              });
+            }
+          }}
+        />
       )}
 
       {schritt === "abschluss" && auswertung && aufgaben && (

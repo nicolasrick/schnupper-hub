@@ -9,6 +9,7 @@ import {
 } from "@/lib/admin";
 import { MODI } from "@/lib/modi";
 import { api } from "@/lib/api";
+import type { ErgebnisEintrag } from "@/lib/ergebnisse";
 import { Bestaetigung } from "../_components/admin/Bestaetigung";
 import { MailVorlagen } from "../_components/admin/MailVorlagen";
 import { Bewertungsbogen } from "../_components/admin/Bewertungsbogen";
@@ -44,11 +45,18 @@ export default function AdminPage() {
   const [modal, setModal] = useState<Modal>("none");
   const [modus, setModusState] = useState("schnuppertag");
   const [abgaben, setAbgaben] = useState<{ key: string; name: string; dateien: { name: string; size: number }[] }[]>([]);
+  const [ergebnisse, setErgebnisse] = useState<ErgebnisEintrag[]>([]);
 
   function ladeAbgaben() {
     fetch("/api/abgabe/list", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then(setAbgaben)
+      .catch(() => {});
+  }
+  function ladeErgebnisse() {
+    fetch("/api/ergebnis", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setErgebnisse)
       .catch(() => {});
   }
 
@@ -59,7 +67,8 @@ export default function AdminPage() {
     if (l.length) setSelectedId(l[0].id);
     api.getModus().then(setModusState).catch(() => {});
     ladeAbgaben();
-    const iv = setInterval(ladeAbgaben, 15000); // neue Abgaben erscheinen live
+    ladeErgebnisse();
+    const iv = setInterval(() => { ladeAbgaben(); ladeErgebnisse(); }, 15000); // live
     return () => clearInterval(iv);
   }, []);
 
@@ -110,7 +119,9 @@ export default function AdminPage() {
     persist([]);
     setSelectedId(null);
     try { await fetch("/api/abgabe", { method: "DELETE" }); } catch { /* ignore */ }
+    try { await fetch("/api/ergebnis", { method: "DELETE" }); } catch { /* ignore */ }
     setAbgaben([]);
+    setErgebnisse([]);
   }
 
   async function abmelden() {
@@ -148,7 +159,8 @@ export default function AdminPage() {
             <p className="text-sm text-white/60">Anlass steuern · Bestätigung · Bewertung · Bericht · Mails</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={exportieren} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">⬇ Export</button>
+            <a href="/api/export/zip" className="rounded-full bg-green px-4 py-2 text-sm font-semibold text-white hover:bg-green-dark">⬇ Alles als ZIP</a>
+            <button onClick={exportieren} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">⬇ Liste (CSV)</button>
             <button onClick={tagAbschliessen} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">🔒 Tag abschliessen</button>
             <Link href="/" className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">Hub →</Link>
             <button onClick={abmelden} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/20 hover:text-white">Abmelden</button>
@@ -172,7 +184,41 @@ export default function AdminPage() {
             </div>
           </div>
           <p className="mt-2 text-xs text-white/40">
-            🔒 Datenarm: Auf dem Server liegt nur der Anlass – keine Personendaten. Namen, Bericht & Bewertung bleiben <b>lokal auf diesem Gerät</b> und werden heruntergeladen. «Tag abschliessen» exportiert & löscht sie hier.
+            🔒 Datensparsam: Auf dem Server liegen nur der Anlass + kurzlebige Check-Ergebnisse (Vorname + Kennzahlen, Auto-Löschung). Namen, Bericht & Bewertung bleiben <b>lokal auf diesem Gerät</b>. «Tag abschliessen» exportiert lokal & löscht alles Server-seitige.
+          </p>
+        </div>
+
+        {/* Eignungs-Check-Ergebnisse (Server-Box, minimiert + kurzlebig) */}
+        <div className="mb-5 rounded-3xl bg-surface p-5 shadow-2xl ring-1 ring-black/5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-ink">🧭 Eignungs-Check ({ergebnisse.length})</h2>
+            <button onClick={ladeErgebnisse} className="text-sm text-ink-soft hover:text-ink">↻ Aktualisieren</button>
+          </div>
+          {ergebnisse.length === 0 ? (
+            <p className="mt-3 text-sm text-ink-soft">Noch keine Ergebnisse. Sobald jemand die Berufswahl-Analyse abschliesst, erscheint hier Vorname + Kennzahlen – als Gesprächs-Hilfe.</p>
+          ) : (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {ergebnisse.map((e) => (
+                <div key={e.id} className="rounded-2xl border border-line p-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="truncate font-semibold text-ink">{e.vorname}</span>
+                    <span className="shrink-0 text-sm font-bold tabular-nums text-green">{e.passung}% Passung</span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
+                    <span>✅ {e.selbststaendig}/{e.total} selbstständig</span>
+                    <span>💡 {e.tipps} Tipps</span>
+                    {e.bonusGemacht && <span>🔥 Bonus {e.bonusSelbststaendig}/{e.bonusTotal}</span>}
+                    {e.topFeld && <span>🏅 {e.topFeld}</span>}
+                  </div>
+                  {e.starkeTeile.length > 0 && (
+                    <p className="mt-1.5 text-xs text-ink-soft">Stark in: {e.starkeTeile.join(", ")}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="mt-3 text-xs text-ink-soft">
+            🔒 Nur Vorname + Kennzahlen (keine Einzelantworten). Wird automatisch nach ~48 h und mit «Tag abschliessen» gelöscht.
           </p>
         </div>
 

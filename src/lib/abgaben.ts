@@ -98,6 +98,26 @@ export async function deleteAllAbgaben(): Promise<void> {
   await fs.rm(ROOT, { recursive: true, force: true });
 }
 
+/** Alles in EINE ZIP: optionale Extra-Dateien (z. B. Ergebnis-CSV) im Wurzel-
+ *  ordner + alle Abgaben unter abgaben/<Name>/<Datei>. Fürs Tag-Ende-Backup. */
+export async function zipAlles(extra: { path: string; content: string | Buffer }[] = []): Promise<Buffer> {
+  const zip = new JSZip();
+  for (const e of extra) zip.file(e.path, e.content);
+  let keys: string[] = [];
+  try { keys = await fs.readdir(ROOT); } catch { keys = []; }
+  for (const key of keys) {
+    const dir = path.join(ROOT, key);
+    const stat = await fs.stat(dir).catch(() => null);
+    if (!stat?.isDirectory()) continue;
+    const name = (await fs.readFile(path.join(dir, "_name.txt"), "utf8").catch(() => key)).trim() || key;
+    const files = (await fs.readdir(dir)).filter((f) => f !== "_name.txt");
+    for (const f of files) {
+      zip.file(`abgaben/${safeFile(name)}/${f}`, await fs.readFile(path.join(dir, f)));
+    }
+  }
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
 /** Auto-Prune: Abgabe-Ordner älter als `stunden` entfernen. */
 export async function pruneAbgaben(stunden: number): Promise<void> {
   let keys: string[];

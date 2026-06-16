@@ -206,100 +206,15 @@ export function auswerten(antworten: Record<string, number>): Auswertung {
 }
 
 // =============================================================================
-//  Mini-Aufgaben
+//  Bausteine für Mini-Aufgaben (vom Eignungs-Check weiter unten genutzt)
 // =============================================================================
 
-// --- 1) Bit-Uhr (eure Aufgabe von Slide 30: 32 16 8 4 2 1) --------------------
+// Bit-Uhr / Binär (eure Aufgabe von Slide 30: 32 16 8 4 2 1)
 export const BIT_WERTE = [32, 16, 8, 4, 2, 1];
-export const BIT_ZIELE = [
-  { ziel: 27, hinweis: "27 Minuten – welche Lämpchen ergeben zusammen 27?" },
-  { ziel: 41, hinweis: "41 Sekunden – tüftle dich an die richtige Kombination heran." },
-];
 
-// --- 2) ServiceDesk-Triage "PC startet nicht" (Slide 26) ----------------------
-export interface TriageSchritt {
-  frage: string;
-  optionen: { text: string; richtig: boolean; feedback: string }[];
-}
-
-export const TRIAGE: TriageSchritt[] = [
-  {
-    frage:
-      "Eine Kundin ruft an: «Mein Computer startet nicht mehr!» Was machst du als Erstes?",
-    optionen: [
-      {
-        text: "Sofort die Festplatte austauschen.",
-        richtig: false,
-        feedback:
-          "Zu schnell! Du weisst ja noch gar nicht, woran es liegt. Erst eingrenzen, dann handeln.",
-      },
-      {
-        text: "Nachfragen: Leuchtet etwas? Kommt ein Bild oder ein Ton? Was passiert genau?",
-        richtig: true,
-        feedback:
-          "Genau so. Im ServiceDesk grenzt du das Problem mit gezielten Fragen ein, bevor du etwas anpackst.",
-      },
-      {
-        text: "Den Computer komplett neu installieren.",
-        richtig: false,
-        feedback:
-          "Das wäre mit Kanonen auf Spatzen geschossen – und alle Daten wären weg. Erst die Ursache suchen.",
-      },
-    ],
-  },
-  {
-    frage:
-      "Die Kundin sagt: «Es leuchtet kein einziges Lämpchen, gar nichts tut sich.» Worauf tippst du zuerst?",
-    optionen: [
-      {
-        text: "Auf die Stromversorgung – Kabel, Steckdose, Netzteil prüfen.",
-        richtig: true,
-        feedback:
-          "Stark. Vom Einfachen zum Komplizierten: kein Lämpchen = oft kein Strom. Das prüft man zuerst.",
-      },
-      {
-        text: "Auf einen Virus.",
-        richtig: false,
-        feedback:
-          "Ein Virus würde den PC nicht komplett tot machen. Wenn nichts leuchtet, fehlt meist schlicht der Strom.",
-      },
-      {
-        text: "Auf ein kaputtes Betriebssystem.",
-        richtig: false,
-        feedback:
-          "Dann würde der PC zumindest kurz anlaufen. Tot = zuerst an den Strom denken.",
-      },
-    ],
-  },
-];
-
-// --- 3) Gerät / Auftrag → Kunde (echte IDS-Kunden, Slide 6) -------------------
+// Echte IDS-Kundschaft (Slide 6) – für die Zuordnungs-Aufgaben
 export const KUNDEN = [
   "Feuerwehr", "Schulen", "Stadtpolizei", "KJZK", "Stadtwerke", "Tiefbauamt",
-];
-
-export interface ZuordnungFrage {
-  auftrag: string;
-  richtig: string;
-  erklaerung: string;
-}
-
-export const ZUORDNUNG: ZuordnungFrage[] = [
-  {
-    auftrag: "Hunderte Computer in Klassenzimmern und Computerräumen einrichten.",
-    richtig: "Schulen",
-    erklaerung: "Schulen brauchen viele, einheitlich aufgesetzte Geräte – ideal fürs Aufsetzen über Netzwerk (SCCM).",
-  },
-  {
-    auftrag: "Robuste, einsatztaugliche Tablets für Fahrzeuge im Ernstfall.",
-    richtig: "Feuerwehr",
-    erklaerung: "Die Feuerwehr braucht zuverlässige Technik, die auch im Einsatz funktioniert.",
-  },
-  {
-    auftrag: "Spezielle Computer in den Behandlungsräumen einer Zahnklinik für Kinder.",
-    richtig: "KJZK",
-    erklaerung: "Das KJZK (Kinder- & Jugend-Zahnklinik) ist eine unserer Kundinnen – auch medizinische Arbeitsplätze betreuen wir.",
-  },
 ];
 
 // =============================================================================
@@ -540,3 +455,259 @@ export const DOWNLOADS: Download[] = [
   { file: "pacman_geruest.sb3", label: "Scratch Pac-Man-Gerüst", desc: "Scratch-Projekt mit Spielbrett & Figuren.", vorhanden: false, tag: 2 },
   { file: "uebung-dokument.docx", label: "Übungsdokument", desc: "Unformatiertes Dokument für die Dokumentformatierung.", vorhanden: false, tag: 1 },
 ];
+
+// =============================================================================
+//  EIGNUNGS-CHECK — der „richtige" Teil: denken, einordnen, ausprobieren.
+//
+//  Ein flacher, durchgezählter Aufgaben-Stream in vier Teilen. Bewusst KEINE
+//  reine Programmierung (Plattformentwicklung = Infrastruktur), aber eine
+//  ehrliche Kostprobe vom „wie ein Computer denkt". Jede Aufgabe = ein Screen,
+//  darum stimmt der Fortschritt (X von N) immer.
+// =============================================================================
+
+export type CheckTeil =
+  | "Logik & Muster"
+  | "Wie ein Computer denkt"
+  | "Einordnen & Priorisieren"
+  | "Praxis im ServiceDesk"
+  | "Vertiefung";
+
+/** Professionelle Kurz-Erklärung pro Bereich: was wird hier erfasst, warum ist
+ *  es berufsrelevant. Wird über jeder Aufgabe gezeigt – so ist die Aufgabe
+ *  verständlich, auch wenn man sie (noch) nicht lösen kann. */
+export const TEIL_INFO: Record<CheckTeil, string> = {
+  "Logik & Muster":
+    "Hier geht es um Mustererkennung und logisches Denken. In der IT erkennst du laufend wiederkehrende Abläufe und Fehlerbilder – wer Muster sieht, findet Ursachen schneller.",
+  "Wie ein Computer denkt":
+    "Hier zählt strukturiertes, schrittweises Denken. Systeme führen Anweisungen exakt der Reihe nach aus – diese Denkweise ist die Grundlage jeder IT-Tätigkeit.",
+  "Einordnen & Priorisieren":
+    "Hier geht es ums Priorisieren. Treffen mehrere Störungen gleichzeitig ein, entscheidet die richtige Reihenfolge über Wirkung und Zeit.",
+  "Praxis im ServiceDesk":
+    "Hier zählt dein Urteilsvermögen in echten Situationen: erst verstehen, dann handeln – die Grundhaltung im Anwendersupport.",
+  "Vertiefung":
+    "Aufgaben für Fortgeschrittene. Sie gehen bewusst tiefer und sind freiwillig – verstehen reicht, lösen ist die Kür.",
+};
+
+interface CheckBasis {
+  id: string;
+  teil: CheckTeil;
+  /** Optionaler Tipp – per „Hilfe"-Knopf abrufbar. Genutzte Hilfe fliesst ins Ergebnis ein. */
+  tipp?: string;
+}
+
+/** Binär einstellen (32-16-8-4-2-1) — wie Computer Zahlen speichern. */
+export interface CheckBituhr extends CheckBasis {
+  typ: "bituhr"; ziel: number; hinweis: string;
+}
+/** Zahlenfolge fortsetzen — Muster erkennen. */
+export interface CheckSequenz extends CheckBasis {
+  typ: "sequenz"; frage: string; folge: number[]; loesung: number; hinweis: string;
+}
+/** Pseudocode lesen — was kommt raus? (Algorithmus-Denken, keine Syntax) */
+export interface CheckPseudocode extends CheckBasis {
+  typ: "pseudocode"; frage: string; zeilen: string[];
+  optionen: { text: string; richtig: boolean }[]; aufloesung: string;
+}
+/** Fehler in einer Befehlsfolge finden — systematisch hinschauen. */
+export interface CheckFehler extends CheckBasis {
+  typ: "fehler"; intro: string; frage: string;
+  zeilen: { text: string; defekt: boolean }[]; feedback: string;
+}
+/** Nach Wichtigkeit/Reihenfolge ordnen — Einordnen & Priorisieren. */
+export interface CheckRanking extends CheckBasis {
+  typ: "ranking"; intro: string; frage: string;
+  /** Aussagen in der KORREKTEN Reihenfolge (Index 0 = zuoberst). */
+  items: string[];
+  /** Anfangs-Anzeige als Index-Reihenfolge (gemischt). */
+  start: number[];
+  hintOben: string; hintUnten: string; erklaerung: string;
+}
+/** ServiceDesk-Entscheidung. */
+export interface CheckTriage extends CheckBasis {
+  typ: "triage"; intro?: string; frage: string;
+  optionen: { text: string; richtig: boolean; feedback: string }[];
+}
+/** Auftrag → richtige Kundin der Stadt. */
+export interface CheckZuordnung extends CheckBasis {
+  typ: "zuordnung"; auftrag: string; richtig: string; erklaerung: string;
+}
+export type CheckItem =
+  | CheckBituhr | CheckSequenz | CheckPseudocode | CheckFehler
+  | CheckRanking | CheckTriage | CheckZuordnung;
+
+export const CHECK_ITEMS: CheckItem[] = [
+  // ---------- Teil 1: Logik & Muster ----------
+  {
+    id: "seq1", teil: "Logik & Muster", typ: "sequenz",
+    frage: "Wie geht die Reihe weiter?",
+    folge: [2, 4, 8, 16], loesung: 32,
+    hinweis: "Jede Zahl ist das Doppelte der vorherigen.",
+  },
+  {
+    id: "seq2", teil: "Logik & Muster", typ: "sequenz",
+    frage: "Und diese Reihe?",
+    folge: [1, 2, 4, 7, 11], loesung: 16,
+    hinweis: "Schau die Abstände an: +1, +2, +3, +4 …",
+  },
+  {
+    id: "bit1", teil: "Logik & Muster", typ: "bituhr",
+    ziel: 27, hinweis: "Welche Lämpchen ergeben zusammen 27?",
+  },
+  {
+    id: "bit2", teil: "Logik & Muster", typ: "bituhr",
+    ziel: 41, hinweis: "Tüftle dich an die richtige Kombination heran.",
+  },
+  // ---------- Teil 2: Wie ein Computer denkt ----------
+  {
+    id: "pc1", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    frage: "Lies die Schritte. Welche Zahl kommt am Ende raus?",
+    zeilen: ["Setze X auf 5", "Verdopple X", "Ziehe 3 ab", "Gib X aus"],
+    optionen: [
+      { text: "7", richtig: true },
+      { text: "10", richtig: false },
+      { text: "13", richtig: false },
+    ],
+    aufloesung: "5 → verdoppeln = 10 → minus 3 = 7. Ein Computer arbeitet Schritt für Schritt von oben nach unten.",
+  },
+  {
+    id: "pc2", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    frage: "Eine Schleife. Was steht am Ende in der Summe?",
+    zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 4:", "    zähle die Zahl zur Summe dazu", "Gib Summe aus"],
+    optionen: [
+      { text: "10", richtig: true },
+      { text: "4", richtig: false },
+      { text: "7", richtig: false },
+    ],
+    aufloesung: "1 + 2 + 3 + 4 = 10. Eine Schleife wiederholt Schritte – das Herz fast jedes Programms.",
+  },
+  {
+    id: "pc3", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    frage: "Jetzt mit einer Bedingung. Wie viele Punkte am Ende?",
+    zeilen: ["Setze Punkte auf 0", "Wenn 8 grösser als 5 ist:", "    Punkte = Punkte + 10", "Sonst:", "    Punkte = Punkte + 1"],
+    optionen: [
+      { text: "10", richtig: true },
+      { text: "1", richtig: false },
+      { text: "11", richtig: false },
+    ],
+    aufloesung: "8 ist grösser als 5 → nur der erste Fall greift → 10. Der «Sonst»-Weg wird gar nicht erst betreten.",
+  },
+  {
+    id: "err1", teil: "Wie ein Computer denkt", typ: "fehler",
+    intro: "Ein kleines Skript soll drei Server der Reihe nach anpingen.",
+    frage: "Welche Zeile kann unmöglich funktionieren?",
+    zeilen: [
+      { text: "ping 192.168.0.1", defekt: false },
+      { text: "ping 192.168.0.256", defekt: true },
+      { text: "ping 192.168.0.10", defekt: false },
+    ],
+    feedback: "Genau. In einer IP-Adresse geht jede Zahl nur von 0 bis 255 – eine 256 gibt es nicht.",
+  },
+  // ---------- Teil 3: Einordnen & Priorisieren ----------
+  {
+    id: "rank1", teil: "Einordnen & Priorisieren", typ: "ranking",
+    intro: "Vier Meldungen treffen fast gleichzeitig im ServiceDesk ein.",
+    frage: "Ordne sie nach Dringlichkeit – das Wichtigste zuoberst.",
+    items: [
+      "Die Feuerwehr-Leitstelle ist komplett offline",
+      "Ein ganzes Schulzimmer hat kein Internet",
+      "Bei einer Mitarbeiterin druckt der Drucker nicht",
+      "Jemand wünscht sich ein neues Mauspad",
+    ],
+    start: [2, 0, 3, 1],
+    hintOben: "dringend", hintUnten: "kann warten",
+    erklaerung: "Je grösser der Schaden und je mehr Menschen betroffen, desto höher die Priorität: Notdienste zuerst, Komfort zuletzt.",
+  },
+  {
+    id: "rank2", teil: "Einordnen & Priorisieren", typ: "ranking",
+    intro: "Ein PC zeigt kein Bild.",
+    frage: "In welcher Reihenfolge prüfst du? Vom Einfachsten zum Aufwändigsten.",
+    items: [
+      "Ist der Bildschirm ein und das Kabel eingesteckt?",
+      "Läuft der Computer überhaupt (Lüfter, Lämpchen)?",
+      "Den Bildschirm an einem anderen PC testen",
+      "Die Grafikkarte ausbauen und prüfen",
+    ],
+    start: [1, 3, 0, 2],
+    hintOben: "zuerst", hintUnten: "zuletzt",
+    erklaerung: "Immer vom Einfachen zum Komplizierten – das spart Zeit und vermeidet unnötiges Schrauben.",
+  },
+  // ---------- Teil 4: Praxis im ServiceDesk ----------
+  {
+    id: "tri1", teil: "Praxis im ServiceDesk", typ: "triage",
+    intro: "Eine Kundin ruft an: «Mein Computer startet nicht mehr!»",
+    frage: "Was machst du als Erstes?",
+    optionen: [
+      { text: "Sofort die Festplatte austauschen.", richtig: false, feedback: "Zu schnell! Du weisst ja noch gar nicht, woran es liegt. Erst eingrenzen, dann handeln." },
+      { text: "Nachfragen: Leuchtet etwas? Kommt ein Bild oder ein Ton? Was passiert genau?", richtig: true, feedback: "Genau so. Im ServiceDesk grenzt du das Problem mit gezielten Fragen ein, bevor du etwas anpackst." },
+      { text: "Den Computer komplett neu installieren.", richtig: false, feedback: "Mit Kanonen auf Spatzen – und alle Daten wären weg. Erst die Ursache suchen." },
+    ],
+  },
+  {
+    id: "tri2", teil: "Praxis im ServiceDesk", typ: "triage",
+    intro: "Die Kundin sagt: «Es leuchtet kein einziges Lämpchen, gar nichts tut sich.»",
+    frage: "Worauf tippst du zuerst?",
+    optionen: [
+      { text: "Auf die Stromversorgung – Kabel, Steckdose, Netzteil prüfen.", richtig: true, feedback: "Stark. Kein Lämpchen = oft schlicht kein Strom. Das prüft man zuerst." },
+      { text: "Auf einen Virus.", richtig: false, feedback: "Ein Virus würde den PC nicht komplett tot machen." },
+      { text: "Auf ein kaputtes Betriebssystem.", richtig: false, feedback: "Dann würde der PC zumindest kurz anlaufen. Tot = zuerst an den Strom denken." },
+    ],
+  },
+  {
+    id: "zu1", teil: "Praxis im ServiceDesk", typ: "zuordnung",
+    auftrag: "Hunderte Computer in Klassenzimmern und Computerräumen einrichten.",
+    richtig: "Schulen",
+    erklaerung: "Schulen brauchen viele, einheitlich aufgesetzte Geräte – ideal fürs Aufsetzen über Netzwerk (SCCM).",
+  },
+  {
+    id: "zu2", teil: "Praxis im ServiceDesk", typ: "zuordnung",
+    auftrag: "Robuste, einsatztaugliche Tablets für Fahrzeuge im Ernstfall.",
+    richtig: "Feuerwehr",
+    erklaerung: "Die Feuerwehr braucht zuverlässige Technik, die auch im Einsatz funktioniert.",
+  },
+];
+
+// Freiwillige, schwerere Bonus-Runde – fordert die schon Erfahrenen.
+export const BONUS_ITEMS: CheckItem[] = [
+  {
+    id: "b-pc", teil: "Vertiefung", typ: "pseudocode",
+    frage: "Eine Schleife mit Bedingung. Welche Zahl steht am Ende in der Summe?",
+    zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 3:", "    wenn die Zahl gerade ist: Summe = Summe + 10", "    sonst: Summe = Summe + 1", "Gib Summe aus"],
+    optionen: [
+      { text: "12", richtig: true },
+      { text: "30", richtig: false },
+      { text: "33", richtig: false },
+    ],
+    aufloesung: "1 ist ungerade (+1 → 1), 2 ist gerade (+10 → 11), 3 ist ungerade (+1 → 12). Bedingung pro Durchgang neu prüfen!",
+    tipp: "Geh die Zahlen 1, 2, 3 einzeln durch und entscheide jedes Mal: gerade (+10) oder ungerade (+1)?",
+  },
+  {
+    id: "b-net", teil: "Vertiefung", typ: "triage",
+    intro: "Dein PC hat die Adresse 192.168.1.50. Drei andere Geräte hängen am Netz.",
+    frage: "Welches Gerät ist NICHT im selben Netzwerk wie dein PC?",
+    optionen: [
+      { text: "Drucker: 192.168.1.20", richtig: false, feedback: "Der ist im selben Netz (192.168.1.x) – gleiche ersten drei Blöcke wie dein PC." },
+      { text: "Server: 192.168.2.10", richtig: true, feedback: "Richtig. Bei 192.168.2.x ist der dritte Block anders (2 statt 1) – ein anderes Netz. Dorthin kommst du nicht direkt." },
+      { text: "Kollege: 192.168.1.99", richtig: false, feedback: "Der ist im selben Netz (192.168.1.x)." },
+    ],
+    tipp: "Vergleiche die ersten drei Zahlen-Blöcke (192.168.1). Wo weicht einer ab?",
+  },
+  {
+    id: "b-seq", teil: "Vertiefung", typ: "sequenz",
+    frage: "Wie geht diese Reihe weiter?",
+    folge: [1, 1, 2, 3, 5, 8],
+    loesung: 13,
+    hinweis: "Zähl die letzten zwei Zahlen zusammen: 5 + 8 = ?",
+    tipp: "Jede Zahl ist die Summe der beiden vorherigen (das ist die berühmte Fibonacci-Reihe).",
+  },
+];
+
+export interface CheckErgebnis {
+  total: number;            // Pflicht-Aufgaben gesamt
+  selbststaendig: number;   // davon ohne Fehlversuch UND ohne Tipp gelöst
+  tipps: number;            // wie oft die Hilfe genutzt wurde
+  /** Teile, in denen alles selbstständig sass */
+  starkeTeile: string[];
+  bonusGemacht: boolean;
+  bonusTotal: number;
+  bonusSelbststaendig: number;
+}

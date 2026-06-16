@@ -94,6 +94,21 @@ export function StepDots({ total, current }: { total: number; current: number })
   );
 }
 
+/** Durchgehende Fortschrittsleiste 0..1 — skaliert auf beliebig viele Schritte
+ *  (ersetzt die Punkte-Reihe, sobald es viele Schritte sind). */
+export function Fortschritt({ value, tone = "light" }: { value: number; tone?: "light" | "dark" }) {
+  const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
+  const track = tone === "dark" ? "bg-white/15" : "bg-black/10";
+  return (
+    <div className={"h-1.5 w-full overflow-hidden rounded-full " + track}>
+      <div
+        className="h-full rounded-full bg-green transition-[width] duration-500 ease-out"
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
 /** Horizontaler Wert-Balken 0..1 für die Auswertung */
 export function Bar({ value, label, emoji }: { value: number; label: string; emoji: string }) {
   const pct = Math.round(value * 100);
@@ -136,16 +151,20 @@ export function BackBar({ title, onBack }: { title: string; onBack: () => void }
   );
 }
 
-/** Offizielles IDS-Logo + Beruf. Logo ist schwarz/rot → auf dunklem Grund
- *  in ein weisses Feld gesetzt (so will es die CI auf dunklen Flächen). */
+/** Schlichter Text-Schriftzug (kein offizielles Logo – nicht freigegeben).
+ *  Roter CI-Balken als dezenter Marken-Akzent auf dunklem Grund. */
 export function Brand() {
   return (
     <div className="flex items-center gap-3">
-      <span className="inline-flex items-center rounded-lg bg-white px-3 py-2 shadow-sm">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/ids-logo.svg" alt="Informatikdienste Stadt St. Gallen" className="h-7 w-auto" />
+      <span className="h-7 w-1 rounded-full bg-green" aria-hidden />
+      <span className="leading-tight">
+        <span className="block text-base font-bold tracking-tight text-white">
+          Stadt St.&nbsp;Gallen
+        </span>
+        <span className="block text-xs font-medium text-white/55">
+          Informatikdienste · Plattformentwicklung EFZ
+        </span>
       </span>
-      <span className="text-sm font-medium text-white/60">Plattformentwicklung EFZ</span>
     </div>
   );
 }

@@ -30,9 +30,10 @@ export function Start({ onStart, onBack }: { onStart: (name: string) => void; on
           Passt die Lehre als <span className="text-green">Plattform&shy;entwickler/in</span> zu dir?
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-          Beantworte ein paar Fragen und löse kleine Aufgaben aus unserem
-          Alltag. Am Ende siehst du, wie gut der Beruf zu dir passt. Dauert
-          etwa 10 Minuten.
+          Zuerst ein paar Fragen zu dir, dann ein Eignungs-Check zu
+          berufsrelevanten Fähigkeiten – logisches Denken, strukturiertes
+          Vorgehen und Urteilsvermögen aus unserem Arbeitsalltag. Am Ende siehst
+          du, wie gut der Beruf zu dir passt. Dauert ca. 25 Minuten.
         </p>
 
         <form onSubmit={submit} className="mt-8">
@@ -55,14 +56,14 @@ export function Start({ onStart, onBack }: { onStart: (name: string) => void; on
         </form>
 
         <p className="mt-6 rounded-2xl bg-green-soft px-4 py-3 text-sm leading-relaxed text-green-dark">
-          🔒 Deine Eingaben bleiben auf diesem Gerät – wir senden nichts an einen
-          Server und speichern nichts dauerhaft. Keine Noten, keine Bewertung – es
-          geht nur darum, dich kennenzulernen.
+          🔒 Deine Daten werden ausschliesslich für die Schnuppertage verwendet und
+          anschliessend gelöscht bzw. intern gespeichert. Erfasst werden nur dein
+          Vorname und dein Ergebnis – keine Noten, keine Bewertung.
         </p>
       </Card>
 
       <p className="mt-6 text-center text-sm text-white/50">
-        Prototyp · ersetzt künftig den ICT-Check am Schnuppertag
+        Informatikdienste Stadt St.&nbsp;Gallen · Schnuppertage
       </p>
     </div>
   );

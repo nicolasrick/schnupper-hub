@@ -36,6 +36,6 @@ export async function DELETE() {
 
 // Auto-Prune bei Bedarf von aussen anstossbar (geschützt via middleware)
 export async function PATCH() {
-  await pruneAbgaben(24);
+  await pruneAbgaben(48);
   return NextResponse.json({ ok: true });
 }

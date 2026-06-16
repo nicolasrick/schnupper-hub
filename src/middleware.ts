@@ -43,9 +43,20 @@ export function middleware(req: NextRequest) {
   if (abgabeSensitive && !authed) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // Eignungs-Check-Ergebnisse: Liste/Löschen nur eingeloggt.
+  // Offen bleibt nur POST /api/ergebnis (das Kind schickt sein Ergebnis).
+  if (pathname === "/api/ergebnis" && req.method !== "POST" && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Gesamt-Export (ZIP) nur eingeloggt.
+  if (pathname.startsWith("/api/export") && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*"],
 };
