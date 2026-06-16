@@ -64,7 +64,7 @@ const POOL: Record<string, Einsatz> = {
     intro: "Die Stadtpolizei ruft an: «Unsere Einsatz-Software startet nicht.»",
     frage: "Was machst du zuerst?",
     optionen: [
-      { text: "Den Server sofort neu starten.", richtig: false, feedback: "Zu schnell. Du weisst ja noch nicht, woran es liegt." },
+      { text: "Das Gerät sofort neu starten.", richtig: false, feedback: "Zu schnell. Du weisst ja noch nicht, woran es liegt." },
       { text: "Nachfragen: seit wann, und sind alle betroffen oder nur ein Gerät?", richtig: true, feedback: "So macht man das. Erst eingrenzen, dann anfassen." },
       { text: "Neue Software bestellen.", richtig: false, feedback: "Viel zu früh – erst die Ursache suchen." },
     ],
@@ -132,6 +132,27 @@ const POOL: Record<string, Einsatz> = {
     loesung: 32,
     hinweis: "Jede Zahl ist das Doppelte der vorherigen – genau wie die Bit-Werte 1, 2, 4, 8 …",
   },
+  cipherOnline: {
+    typ: "cipher", id: "cipherOnline", titel: "Die Geheimschrift",
+    intro: "Ein Teil der Anzeige ist verschlüsselt – mit einer alten Geheimschrift: jeder Buchstabe ist um 3 Stellen verschoben (A→D, B→E …).",
+    frage: "Entschlüssle das Wort. Schieb jeden Buchstaben 3 Stellen ZURÜCK:",
+    chiffre: "RQOLQH", shift: 3, loesung: ["online"],
+    hinweis: "R → Q → P → O. Mach das mit jedem Buchstaben. Nutz die Alphabet-Leiste unten.",
+  },
+  offlineRundgang: {
+    typ: "code", id: "offlineRundgang", titel: "Aussen-Einsatz: der Rundgang",
+    intro: "Zeit, den Stuhl zu verlassen. Beim Rundgang durch die IDS – z. B. beim Serverraum oder im Warenlager – hängt irgendwo ein Buchstabe.",
+    frage: "Finde den Buchstaben beim Rundgang und tipp ihn hier ein.",
+    loesung: ["r"],
+    hinweis: "Augen auf an den Posten, die du beim Rundgang siehst. Gross-/Kleinschreibung egal.",
+  },
+  offlineFestplatte: {
+    typ: "code", id: "offlineFestplatte", titel: "Aussen-Einsatz: die Festplatte",
+    intro: "Letzter Schritt – und der ist handfest. Am Nachmittag baust du eine Festplatte aus. Auf der Unterseite klebt ein Buchstabe.",
+    frage: "Bau die Festplatte aus, lies den Buchstaben und tipp ihn ein.",
+    loesung: ["k"],
+    hinweis: "Schau auf die Unterseite der ausgebauten Festplatte. Gross-/Kleinschreibung egal.",
+  },
 };
 
 // -----------------------------------------------------------------------------
@@ -147,22 +168,23 @@ const beat = (emoji: string, titel: string, text: string): BeatSchritt => ({ kin
 export interface Playlist { masterWort: string; schritte: Schritt[]; }
 
 // Voll (Schnuppertag / Nachmittag / Triebwerk) – 8 Einsätze, eskalierend,
-// Master-Code «NEUSTART». Mit Story-Beats (Eskalation + Ursache-Reveal).
+// Master-Code «NETZWERK». 6 am Bildschirm + 2 Aussen-Einsätze (Rundgang +
+// Festplatte) → die Mission verzahnt sich mit dem echten Tag. Mit Story-Beats.
 const PLAYLIST_VOLL: Playlist = {
-  masterWort: "NEUSTART",
+  masterWort: "NETZWERK",
   schritte: [
     e("triage", "N"),
     e("quizBinaer", "E"),
-    e("matchingFeuerwehr", "U"),
+    e("matchingFeuerwehr", "T"),
     beat("📟", "Die Lage spitzt sich zu",
-      "Während du arbeitest, fallen weitere Stellen aus: die St.Galler Stadtwerke, dann das Tiefbauamt. Im ServiceDesk wird es laut. Jetzt wird's kniffliger – bleib ruhig und denk mit."),
-    e("cipherServer", "S"),
-    e("codeServer", "T"),
-    e("binaerBuchstabe", "A"),
-    beat("🔎", "Die Ursache",
-      "Du findest es heraus: Es war kein Hacker. Ein Update für die ganze Stadtverwaltung lief letzte Nacht schief und hat die Server überlastet. Jetzt weisst du, was zu tun ist – zwei Einsätze noch."),
-    e("fehlerIp", "R"),
-    e("sequenzVerdopplung", "T"),
+      "Während du arbeitest, fallen weitere Stellen aus: die Schulen, dann die St.Galler Stadtwerke. Im ServiceDesk wird es laut. Jetzt wird's kniffliger – bleib ruhig und denk mit."),
+    e("cipherOnline", "Z"),
+    e("binaerBuchstabe", "W"),
+    e("fehlerIp", "E"),
+    beat("🥾", "Raus ins Feld",
+      "Die letzten zwei Codes liegen nicht am Bildschirm. Hol sie dir vor Ort: einen beim Rundgang durch die IDS, einen an der Festplatte, die du ausbaust. Augen auf!"),
+    e("offlineRundgang", "R"),
+    e("offlineFestplatte", "K"),
   ],
 };
 

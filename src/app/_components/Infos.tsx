@@ -16,8 +16,7 @@ export function Infos({ onBack }: { onBack: () => void }) {
         <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Lehre &amp; Bewerbung</h2>
         <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
           Alle Infos zur Lehre als Informatiker/in Plattformentwicklung und wie du
-          dich bewirbst. Scann den Code mit deinem Handy – dann hast du die Seite
-          gleich dabei.
+          dich bewirbst.
         </p>
 
         <div className="mt-7 flex justify-center">
