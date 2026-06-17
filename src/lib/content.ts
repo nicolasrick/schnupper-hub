@@ -511,6 +511,8 @@ export const TEIL_INFO: Record<CheckTeil, string> = {
 interface CheckBasis {
   id: string;
   teil: CheckTeil;
+  /** Kurzes Intro über der Aufgabe: worum geht es, was ist zu tun. */
+  intro?: string;
   /** Optionaler Tipp – per „Hilfe"-Knopf abrufbar. Genutzte Hilfe fliesst ins Ergebnis ein. */
   tipp?: string;
 }
@@ -551,18 +553,15 @@ export interface CheckTriage extends CheckBasis {
 export interface CheckZuordnung extends CheckBasis {
   typ: "zuordnung"; auftrag: string; richtig: string; erklaerung: string;
 }
-/** Datei auf dem PC finden und das Codewort eintippen (Datei legt der Betrieb ab). */
-export interface CheckCode extends CheckBasis {
-  typ: "code"; frage: string; loesung: string[]; hinweis: string;
-}
 export type CheckItem =
   | CheckBituhr | CheckSequenz | CheckPseudocode | CheckFehler
-  | CheckRanking | CheckTriage | CheckZuordnung | CheckCode;
+  | CheckRanking | CheckTriage | CheckZuordnung;
 
 export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 1: Logik & Muster ----------
   {
     id: "seq1", teil: "Logik & Muster", typ: "sequenz",
+    intro: "Erkenne das Muster: Welche Zahl setzt die Reihe logisch fort? Tipp die nächste Zahl ein.",
     frage: "Wie geht die Reihe weiter?",
     folge: [2, 4, 8, 16], loesung: 32,
     hinweis: "Jede Zahl ist das Doppelte der vorherigen.",
@@ -584,6 +583,7 @@ export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 2: Wie ein Computer denkt ----------
   {
     id: "pc1", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    intro: "«Pseudocode» ist ein Rezept in einfachen Schritten – so plant man ein Programm, bevor man es schreibt. Lies die Schritte von oben nach unten und rechne mit.",
     frage: "Lies die Schritte. Welche Zahl kommt am Ende raus?",
     zeilen: ["Setze X auf 5", "Verdopple X", "Ziehe 3 ab", "Gib X aus"],
     optionen: [
@@ -678,6 +678,7 @@ export const CHECK_ITEMS: CheckItem[] = [
   },
   {
     id: "zu1", teil: "Praxis im ServiceDesk", typ: "zuordnung",
+    intro: "Die IDS betreut die ganze Stadt – von der Feuerwehr bis zu den Schulen. Ordne den Auftrag der richtigen Stelle zu.",
     auftrag: "Hunderte Computer in Klassenzimmern und Computerräumen einrichten.",
     richtig: "Schulen",
     erklaerung: "Schulen brauchen viele, einheitlich aufgesetzte Geräte – ideal fürs Aufsetzen über Netzwerk (SCCM).",
@@ -687,13 +688,6 @@ export const CHECK_ITEMS: CheckItem[] = [
     auftrag: "Robuste, einsatztaugliche Tablets für Fahrzeuge im Ernstfall.",
     richtig: "Feuerwehr",
     erklaerung: "Die Feuerwehr braucht zuverlässige Technik, die auch im Einsatz funktioniert.",
-  },
-  {
-    id: "datei", teil: "Praxis im ServiceDesk", typ: "code",
-    frage: "Auf dem Desktop liegt der Ordner «Einsatz» mit der Datei «codewort.txt». Öffne sie – wie lautet das Codewort?",
-    loesung: ["server", "der server", "server läuft"],
-    hinweis: "Doppelklick auf den Ordner «Einsatz», dann auf «codewort.txt». Gross-/Kleinschreibung egal.",
-    tipp: "Schau auf dem Desktop nach dem Ordner «Einsatz» – die Datei liegt darin.",
   },
 ];
 
