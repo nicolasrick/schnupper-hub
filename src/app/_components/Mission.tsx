@@ -134,9 +134,12 @@ function BeatView({ s, onWeiter }: { s: BeatSchritt; onWeiter: () => void }) {
 /* Wiederkehrender Fragment-Hinweis nach gelöstem Einsatz */
 function Fragment({ frag }: { frag: string }) {
   return (
-    <p className="pop mt-4 rounded-2xl bg-green-soft px-4 py-3 text-center text-sm font-semibold text-green-dark">
-      🔓 Code-Fragment freigeschaltet: <span className="text-lg tabular-nums">{frag}</span>
-    </p>
+    <div className="pop mt-4 rounded-2xl bg-green-soft px-4 py-3 text-center text-green-dark">
+      <p className="text-sm font-semibold">
+        🔓 Code-Fragment freigeschaltet: <span className="text-2xl tabular-nums">{frag}</span>
+      </p>
+      <p className="mt-1 text-xs">✍️ Schreib diesen Buchstaben auf deinen Block – du brauchst ihn am Schluss!</p>
+    </div>
   );
 }
 
@@ -523,26 +526,27 @@ function MasterCode({ fragmente, wort, onDone }: { fragmente: string[]; wort: st
       <div className="text-4xl">🧩</div>
       <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Setz den Master-Code zusammen</h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
-        Du hast aus jedem Einsatz ein Code-Fragment. Setz sie in der richtigen
-        Reihenfolge zusammen und gib den Master-Code ein – damit fährst du die
-        Systeme der Stadt wieder hoch.
+        Du hast aus jedem Einsatz einen Buchstaben gesammelt. Nimm deinen Block,
+        setz sie in der richtigen Reihenfolge zusammen und tipp den Master-Code ein –
+        damit fährst du die Systeme der Stadt wieder hoch.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-2">
-        {fragmente.map((f, i) => (
-          <span key={i} className="grid h-12 w-12 place-items-center rounded-xl border-2 border-green bg-green-soft text-2xl font-bold text-green-dark">
-            {f}
+        {fragmente.map((_, i) => (
+          <span key={i} className="grid h-12 w-12 place-items-center rounded-xl border-2 border-dashed border-green/50 bg-green-soft/40 text-2xl font-bold text-green/70">
+            ?
           </span>
         ))}
       </div>
+      <p className="mt-2 text-xs text-ink-soft">{fragmente.length} Buchstaben – von deinem Block ablesen.</p>
       <input
         value={wert}
         onChange={(ev) => setWert(ev.target.value.toUpperCase())}
         placeholder="MASTER-CODE"
-        className="mt-6 w-full max-w-xs rounded-2xl border border-line px-5 py-3 text-center text-xl font-bold tracking-[0.3em] outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+        className="mt-4 w-full max-w-xs rounded-2xl border border-line px-5 py-3 text-center text-xl font-bold tracking-[0.3em] outline-none focus:border-green focus:ring-4 focus:ring-green/20"
       />
       {falsch > 0 && (
         <p className="mt-3 text-sm text-amber">
-          Noch nicht. {falsch >= 2 ? "Tipp: Lies die Kacheln von links nach rechts." : "Schau die Fragmente nochmal an."}
+          Noch nicht. {falsch >= 2 ? "Tipp: Lies deine notierten Buchstaben in der Reihenfolge, in der du sie bekommen hast." : "Schau nochmal auf deinen Block."}
         </p>
       )}
       <div className="mt-6 flex justify-center">

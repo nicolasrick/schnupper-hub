@@ -135,6 +135,15 @@ export const FRAGEN: Frage[] = [
   { id: "q14", text: "Mir ist wichtig, dass Daten sicher sind und nicht in falsche Hände geraten.", dim: "verantwortung" },
   { id: "q15", text: "Wenn etwas nicht funktioniert, bleibe ich ruhig und probiere weiter.", dim: "belastbarkeit" },
   { id: "q16", text: "Auch wenn es stressig wird, behalte ich einen kühlen Kopf.", dim: "belastbarkeit" },
+  // Indirektere Fragen (Persönlichkeit/Interessen – weisen nicht direkt auf IT hin)
+  { id: "q17", text: "Ich baue, bastle oder repariere gern etwas mit den Händen – auch ausserhalb vom Computer.", dim: "hardware" },
+  { id: "q18", text: "Ich zeichne, gestalte oder tüftle gern an eigenen Ideen.", dim: "tuefteln" },
+  { id: "q19", text: "Knobelaufgaben und Rätsel reizen mich – ich bleibe dran, bis ich sie löse.", dim: "tuefteln" },
+  { id: "q20", text: "Wenn jemand Hilfe braucht, bin ich gern zur Stelle.", dim: "service" },
+  { id: "q21", text: "Ich arbeite gern mit anderen zusammen an einer Aufgabe.", dim: "service" },
+  { id: "q22", text: "Ich mag es, wenn Dinge geordnet sind und nichts vergessen geht.", dim: "sorgfalt" },
+  { id: "q23", text: "Ich will oft wissen, wie Sachen im Inneren funktionieren.", dim: "neugier" },
+  { id: "q24", text: "Wenn mir jemand etwas anvertraut, gehe ich besonders sorgfältig damit um.", dim: "verantwortung" },
 ];
 
 export const SKALA = [
