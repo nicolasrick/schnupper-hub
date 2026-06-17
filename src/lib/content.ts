@@ -116,6 +116,9 @@ export interface Frage {
   id: string;
   text: string;
   dim: DimId;
+  /** Umgekehrt gepolt: hier ist „trifft genau zu" die schlechte Antwort.
+   *  Verhindert, dass blindes „immer trifft genau zu" gewinnt – man muss lesen. */
+  reverse?: boolean;
 }
 
 export const FRAGEN: Frage[] = [
@@ -144,6 +147,13 @@ export const FRAGEN: Frage[] = [
   { id: "q22", text: "Ich mag es, wenn Dinge geordnet sind und nichts vergessen geht.", dim: "sorgfalt" },
   { id: "q23", text: "Ich will oft wissen, wie Sachen im Inneren funktionieren.", dim: "neugier" },
   { id: "q24", text: "Wenn mir jemand etwas anvertraut, gehe ich besonders sorgfältig damit um.", dim: "verantwortung" },
+  // Umgekehrt gepolt – hier ist „trifft genau zu" die schlechte Antwort (gegen blindes Durchklicken)
+  { id: "r1", text: "Wenn etwas nicht sofort klappt, verliere ich schnell die Lust.", dim: "belastbarkeit", reverse: true },
+  { id: "r2", text: "Anleitungen lesen finde ich mühsam – ich lege lieber gleich drauflos.", dim: "sorgfalt", reverse: true },
+  { id: "r3", text: "Mit Schrauben, Kabeln und Geräten zu hantieren ist eher nichts für mich.", dim: "hardware", reverse: true },
+  { id: "r4", text: "Bei einem kniffligen Problem gebe ich lieber schnell auf, statt lange zu suchen.", dim: "tuefteln", reverse: true },
+  { id: "r5", text: "Wie Technik im Inneren funktioniert, interessiert mich eigentlich kaum.", dim: "neugier", reverse: true },
+  { id: "r6", text: "Wenn jemand gestresst Hilfe braucht, werde ich schnell ungeduldig.", dim: "service", reverse: true },
 ];
 
 export const SKALA = [
@@ -177,7 +187,8 @@ export function auswerten(antworten: Record<string, number>): Auswertung {
   };
   for (const frage of FRAGEN) {
     const a = antworten[frage.id];
-    if (typeof a === "number") proDim[frage.dim].push(a);
+    // Umgekehrt gepolte Fragen invertieren (3 - a): „trifft genau zu" zieht hier ab.
+    if (typeof a === "number") proDim[frage.dim].push(frage.reverse ? 3 - a : a);
   }
 
   const scores: DimScore[] = (Object.keys(proDim) as DimId[]).map((id) => {
@@ -540,9 +551,13 @@ export interface CheckTriage extends CheckBasis {
 export interface CheckZuordnung extends CheckBasis {
   typ: "zuordnung"; auftrag: string; richtig: string; erklaerung: string;
 }
+/** Datei auf dem PC finden und das Codewort eintippen (Datei legt der Betrieb ab). */
+export interface CheckCode extends CheckBasis {
+  typ: "code"; frage: string; loesung: string[]; hinweis: string;
+}
 export type CheckItem =
   | CheckBituhr | CheckSequenz | CheckPseudocode | CheckFehler
-  | CheckRanking | CheckTriage | CheckZuordnung;
+  | CheckRanking | CheckTriage | CheckZuordnung | CheckCode;
 
 export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 1: Logik & Muster ----------
@@ -672,6 +687,13 @@ export const CHECK_ITEMS: CheckItem[] = [
     auftrag: "Robuste, einsatztaugliche Tablets für Fahrzeuge im Ernstfall.",
     richtig: "Feuerwehr",
     erklaerung: "Die Feuerwehr braucht zuverlässige Technik, die auch im Einsatz funktioniert.",
+  },
+  {
+    id: "datei", teil: "Praxis im ServiceDesk", typ: "code",
+    frage: "Auf dem Desktop liegt der Ordner «Einsatz» mit der Datei «codewort.txt». Öffne sie – wie lautet das Codewort?",
+    loesung: ["server", "der server", "server läuft"],
+    hinweis: "Doppelklick auf den Ordner «Einsatz», dann auf «codewort.txt». Gross-/Kleinschreibung egal.",
+    tipp: "Schau auf dem Desktop nach dem Ordner «Einsatz» – die Datei liegt darin.",
   },
 ];
 

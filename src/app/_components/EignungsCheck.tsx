@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   CHECK_ITEMS, BONUS_ITEMS, TEIL_INFO, CheckErgebnis, KUNDEN, BIT_WERTE,
-  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckItem,
+  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckCode, CheckItem,
 } from "@/lib/content";
 import { Card, Button, Fortschritt } from "./ui";
 
@@ -76,6 +76,7 @@ export function EignungsCheck({ onDone }: { onDone: (e: CheckErgebnis) => void }
       {item?.typ === "ranking" && <RankingView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "triage" && <TriageView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "zuordnung" && <ZuordnungView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
+      {item?.typ === "code" && <CodeView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
 
       {schritt === OFFER && (
         <BonusAngebot
@@ -453,6 +454,42 @@ function ZuordnungView({ e, kicker, onNext }: { e: CheckZuordnung; kicker: strin
       )}
       {!richtig && <Hilfe text={e.tipp ?? "Überleg, wer solche Geräte im Alltag wirklich braucht."} offen={tipp} onOeffnen={() => setTipp(true)} />}
       {richtig && <div className="mt-5 flex justify-end"><Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button></div>}
+    </Card>
+  );
+}
+
+/* ---------- Datei auf dem PC finden ---------- */
+function CodeView({ e, kicker, onNext }: { e: CheckCode; kicker: string; onNext: SolveFn }) {
+  const [wert, setWert] = useState("");
+  const [status, setStatus] = useState<"offen" | "richtig" | "falsch">("offen");
+  const [fehler, setFehler] = useState(0);
+  const [tipp, setTipp] = useState(false);
+
+  function pruefen() {
+    const v = wert.trim().toLowerCase();
+    if (v.length > 0 && e.loesung.some((l) => l.toLowerCase() === v)) setStatus("richtig");
+    else { setStatus("falsch"); setFehler((f) => f + 1); }
+  }
+
+  return (
+    <Card className="p-8 sm:p-10">
+      <Kicker text={kicker} />
+      <h2 className="mt-2 text-2xl font-bold leading-snug">{e.frage}</h2>
+      <input
+        value={wert}
+        onChange={(ev) => { setWert(ev.target.value); setStatus("offen"); }}
+        placeholder="Codewort eingeben"
+        disabled={status === "richtig"}
+        className="mt-5 w-full rounded-2xl border border-line px-5 py-3 text-lg outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+      />
+      {status === "falsch" && <p className="mt-3 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-amber">Noch nicht gefunden. Tipp: {e.hinweis}</p>}
+      {status === "richtig" && <p className="mt-3 rounded-2xl bg-green-soft px-4 py-3 text-sm text-green-dark">✅ Gefunden – stark!</p>}
+      {status !== "richtig" && <Hilfe text={e.tipp ?? e.hinweis} offen={tipp} onOeffnen={() => setTipp(true)} />}
+      <div className="mt-5 flex justify-end">
+        {status === "richtig"
+          ? <Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button>
+          : <Button onClick={pruefen} disabled={wert.trim().length === 0}>Prüfen</Button>}
+      </div>
     </Card>
   );
 }
