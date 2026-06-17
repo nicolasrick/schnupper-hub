@@ -105,7 +105,7 @@ function Intro({ modusId, onStart }: { modusId: string | null; onStart: (t: Team
       <h2 className="mt-1 text-3xl font-bold sm:text-4xl">{MISSION_STORY.titel}</h2>
       <p className="mx-auto mt-4 max-w-lg leading-relaxed text-ink-soft">{MISSION_STORY.intro}</p>
 
-      <p className="mt-6 text-xs text-ink-soft">{kurz ? "Kurz-Einsatz · ca. 10 Min" : "Voll-Einsatz · 8 Aufträge · 2 davon vor Ort (Rundgang & Festplatte)"}</p>
+      <p className="mt-6 text-xs text-ink-soft">{kurz ? "Kurz-Einsatz · ca. 10 Min" : "Voll-Einsatz · 8 Aufträge · 1 davon vor Ort (Rundgang)"}</p>
       <div className="mt-6 flex justify-center">
         <Button onClick={() => onStart({ team: false, name: "" })}>Einsatz starten →</Button>
       </div>

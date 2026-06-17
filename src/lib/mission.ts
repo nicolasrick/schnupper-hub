@@ -168,8 +168,9 @@ const beat = (emoji: string, titel: string, text: string): BeatSchritt => ({ kin
 export interface Playlist { masterWort: string; schritte: Schritt[]; }
 
 // Voll (Schnuppertag / Nachmittag / Triebwerk) – 8 Einsätze, eskalierend,
-// Master-Code «NETZWERK». 6 am Bildschirm + 2 Aussen-Einsätze (Rundgang +
-// Festplatte) → die Mission verzahnt sich mit dem echten Tag. Mit Story-Beats.
+// Master-Code «NETZWERK». 7 am Bildschirm + 1 Aussen-Einsatz (Rundgang → R)
+// → die Mission verzahnt sich mit dem echten Tag. Mit Story-Beats.
+// K wird digital gelöst (Bit-Code des 11. Buchstabens), R bleibt offline.
 const PLAYLIST_VOLL: Playlist = {
   masterWort: "NETZWERK",
   schritte: [
@@ -179,12 +180,12 @@ const PLAYLIST_VOLL: Playlist = {
     beat("📟", "Die Lage spitzt sich zu",
       "Während du arbeitest, fallen weitere Stellen aus: die Schulen, dann die St.Galler Stadtwerke. Im ServiceDesk wird es laut. Jetzt wird's kniffliger – bleib ruhig und denk mit."),
     e("cipherOnline", "Z"),
-    e("binaerBuchstabe", "W"),
+    e("sequenzVerdopplung", "W"),
     e("fehlerIp", "E"),
     beat("🥾", "Raus ins Feld",
-      "Die letzten zwei Codes liegen nicht am Bildschirm. Hol sie dir vor Ort: einen beim Rundgang durch die IDS, einen an der Festplatte, die du ausbaust. Augen auf!"),
+      "Der nächste Code liegt nicht am Bildschirm. Hol ihn dir vor Ort: beim Rundgang durch die IDS – z. B. beim Serverraum oder im Warenlager hängt ein Buchstabe. Augen auf!"),
     e("offlineRundgang", "R"),
-    e("offlineFestplatte", "K"),
+    e("binaerBuchstabe", "K"),
   ],
 };
 
