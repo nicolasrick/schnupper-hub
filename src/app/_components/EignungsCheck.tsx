@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   CHECK_ITEMS, BONUS_ITEMS, TEIL_INFO, CheckErgebnis, KUNDEN, BIT_WERTE,
-  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckItem,
+  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckCipher, CheckItem,
 } from "@/lib/content";
 import { Card, Button, Fortschritt } from "./ui";
 
@@ -76,6 +76,7 @@ export function EignungsCheck({ onDone }: { onDone: (e: CheckErgebnis) => void }
       {item?.typ === "ranking" && <RankingView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "triage" && <TriageView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "zuordnung" && <ZuordnungView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
+      {item?.typ === "cipher" && <CipherView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
 
       {schritt === OFFER && (
         <BonusAngebot
@@ -456,6 +457,54 @@ function ZuordnungView({ e, kicker, onNext }: { e: CheckZuordnung; kicker: strin
       )}
       {!richtig && <Hilfe text={e.tipp ?? "Überleg, wer solche Geräte im Alltag wirklich braucht."} offen={tipp} onOeffnen={() => setTipp(true)} />}
       {richtig && <div className="mt-5 flex justify-end"><Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button></div>}
+    </Card>
+  );
+}
+
+/* ---------- Geheimschrift (Caesar) ---------- */
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+function CipherView({ e, kicker, onNext }: { e: CheckCipher; kicker: string; onNext: SolveFn }) {
+  const [wert, setWert] = useState("");
+  const [status, setStatus] = useState<"offen" | "richtig" | "falsch">("offen");
+  const [fehler, setFehler] = useState(0);
+  const [tipp, setTipp] = useState(false);
+
+  function pruefen() {
+    const v = wert.trim().toLowerCase();
+    if (v.length > 0 && e.loesung.some((l) => l.toLowerCase() === v)) setStatus("richtig");
+    else { setStatus("falsch"); setFehler((f) => f + 1); }
+  }
+
+  return (
+    <Card className="p-8 sm:p-10">
+      <Kicker text={kicker} />
+      {e.intro && <p className="mt-3 rounded-2xl bg-black/5 px-4 py-3 font-medium">{e.intro}</p>}
+      <h2 className="mt-4 text-xl font-bold leading-snug">{e.frage}</h2>
+      <div className="mt-4 flex justify-center gap-1.5 sm:gap-2">
+        {e.chiffre.split("").map((c, i) => (
+          <span key={i} className="grid h-12 w-9 place-items-center rounded-lg border-2 border-line bg-black/5 font-mono text-2xl font-bold text-ink sm:h-14 sm:w-11">{c}</span>
+        ))}
+      </div>
+      <div className="mt-4 overflow-x-auto">
+        <div className="mx-auto flex w-max gap-0.5 rounded-xl bg-black/5 p-1.5 font-mono text-[11px] text-ink-soft">
+          {ALPHABET.map((a) => <span key={a} className="grid h-5 w-5 place-items-center tabular-nums">{a}</span>)}
+        </div>
+      </div>
+      <input
+        value={wert}
+        onChange={(ev) => { setWert(ev.target.value); setStatus("offen"); }}
+        placeholder="Entschlüsseltes Wort"
+        disabled={status === "richtig"}
+        className="mt-5 w-full rounded-2xl border border-line px-5 py-3 text-lg uppercase tracking-widest outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+      />
+      {status === "falsch" && <p className="mt-3 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-amber">Noch nicht. Tipp: {e.hinweis}</p>}
+      {status === "richtig" && <p className="mt-3 rounded-2xl bg-green-soft px-4 py-3 text-sm text-green-dark">✅ Entschlüsselt – stark!</p>}
+      {status !== "richtig" && <Hilfe text={e.tipp ?? e.hinweis} offen={tipp} onOeffnen={() => setTipp(true)} />}
+      <div className="mt-5 flex justify-end">
+        {status === "richtig"
+          ? <Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button>
+          : <Button onClick={pruefen} disabled={wert.trim().length === 0}>Entschlüsseln</Button>}
+      </div>
     </Card>
   );
 }

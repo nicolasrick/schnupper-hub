@@ -553,9 +553,13 @@ export interface CheckTriage extends CheckBasis {
 export interface CheckZuordnung extends CheckBasis {
   typ: "zuordnung"; auftrag: string; richtig: string; erklaerung: string;
 }
+/** Caesar-Geheimschrift entschlüsseln – Verschlüsselung/IT-Sicherheit als Kostprobe. */
+export interface CheckCipher extends CheckBasis {
+  typ: "cipher"; frage: string; chiffre: string; loesung: string[]; hinweis: string;
+}
 export type CheckItem =
   | CheckBituhr | CheckSequenz | CheckPseudocode | CheckFehler
-  | CheckRanking | CheckTriage | CheckZuordnung;
+  | CheckRanking | CheckTriage | CheckZuordnung | CheckCipher;
 
 export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 1: Logik & Muster ----------
@@ -582,19 +586,8 @@ export const CHECK_ITEMS: CheckItem[] = [
   },
   // ---------- Teil 2: Wie ein Computer denkt ----------
   {
-    id: "pc1", teil: "Wie ein Computer denkt", typ: "pseudocode",
-    intro: "«Pseudocode» ist ein Rezept in einfachen Schritten – so plant man ein Programm, bevor man es schreibt. Lies die Schritte von oben nach unten und rechne mit.",
-    frage: "Lies die Schritte. Welche Zahl kommt am Ende raus?",
-    zeilen: ["Setze X auf 5", "Verdopple X", "Ziehe 3 ab", "Gib X aus"],
-    optionen: [
-      { text: "7", richtig: true },
-      { text: "10", richtig: false },
-      { text: "13", richtig: false },
-    ],
-    aufloesung: "5 → verdoppeln = 10 → minus 3 = 7. Ein Computer arbeitet Schritt für Schritt von oben nach unten.",
-  },
-  {
     id: "pc2", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    intro: "«Pseudocode» ist ein Rezept in einfachen Schritten. Eine «Schleife» wiederholt Schritte mehrmals – das Herz fast jedes Programms. Lies von oben nach unten und rechne mit.",
     frage: "Eine Schleife. Was steht am Ende in der Summe?",
     zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 4:", "    zähle die Zahl zur Summe dazu", "Gib Summe aus"],
     optionen: [
@@ -606,6 +599,7 @@ export const CHECK_ITEMS: CheckItem[] = [
   },
   {
     id: "pc3", teil: "Wie ein Computer denkt", typ: "pseudocode",
+    intro: "Eine «Bedingung» (wenn … sonst …) lässt den Computer abzweigen – nur EIN Weg wird genommen. Welcher?",
     frage: "Jetzt mit einer Bedingung. Wie viele Punkte am Ende?",
     zeilen: ["Setze Punkte auf 0", "Wenn 8 grösser als 5 ist:", "    Punkte = Punkte + 10", "Sonst:", "    Punkte = Punkte + 1"],
     optionen: [
@@ -625,6 +619,15 @@ export const CHECK_ITEMS: CheckItem[] = [
       { text: "ping 192.168.0.10", defekt: false },
     ],
     feedback: "Genau. In einer IP-Adresse geht jede Zahl nur von 0 bis 255 – eine 256 gibt es nicht.",
+  },
+  {
+    id: "cipher", teil: "Wie ein Computer denkt", typ: "cipher",
+    intro: "In der IT werden Daten verschlüsselt, damit sie niemand mitlesen kann. Eine ganz alte Methode: jeder Buchstabe wird um 3 Stellen verschoben (A→D, B→E …).",
+    frage: "Entschlüssle das Wort – schieb jeden Buchstaben 3 Stellen ZURÜCK:",
+    chiffre: "VWDGW",
+    loesung: ["stadt"],
+    hinweis: "V → U → T → S. Mach das mit jedem Buchstaben. Nutz die Alphabet-Leiste unten.",
+    tipp: "Geh pro Buchstabe 3 Schritte im Alphabet zurück. V wird zu S, W wird zu T …",
   },
   // ---------- Teil 3: Einordnen & Priorisieren ----------
   {
