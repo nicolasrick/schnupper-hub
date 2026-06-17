@@ -33,7 +33,7 @@ export function Start({ onStart, onBack }: { onStart: (name: string) => void; on
           Zuerst ein paar Fragen zu dir, dann ein Eignungs-Check zu
           berufsrelevanten Fähigkeiten – logisches Denken, strukturiertes
           Vorgehen und Urteilsvermögen, wie sie in der IT gefragt sind. Am Ende
-          siehst du, wie gut der Beruf zu dir passt. Dauert ca. 25 Minuten.
+          siehst du, wie gut der Beruf zu dir passt. Dauert ca. 15 Minuten.
         </p>
 
         <form onSubmit={submit} className="mt-8">

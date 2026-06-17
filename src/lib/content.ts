@@ -121,39 +121,30 @@ export interface Frage {
   reverse?: boolean;
 }
 
+// Echte Berufswahl-Analyse: Interessen, Arbeitsweise & Situationen – jede Frage
+// einmal, kein „Anfang = Ende umgekehrt". Wenige umgekehrt gepolte Fragen sind
+// VERSTREUT und situativ formuliert (gegen blindes Durchklicken).
 export const FRAGEN: Frage[] = [
-  { id: "q1", text: "Ich nehme gerne Geräte auseinander, um zu verstehen, wie sie funktionieren.", dim: "hardware" },
-  { id: "q2", text: "Mit den Händen arbeiten (Kabel, Schrauben, Komponenten) liegt mir mehr, als nur am Bildschirm zu sitzen.", dim: "hardware" },
-  { id: "q3", text: "Wenn etwas nicht funktioniert, probiere ich systematisch, bis ich die Ursache gefunden habe.", dim: "tuefteln" },
-  { id: "q4", text: "Ein kniffliges Logik-Rätsel lässt mir keine Ruhe, bis ich es gelöst habe.", dim: "tuefteln" },
-  { id: "q5", text: "Es macht mir Freude, anderen bei technischen Problemen zu helfen.", dim: "service" },
-  { id: "q6", text: "Ich bleibe ruhig, wenn jemand gestresst ist und schnell Hilfe braucht.", dim: "service" },
-  { id: "q7", text: "Ich arbeite gern sauber und schreibe auf, was ich gemacht habe.", dim: "sorgfalt" },
-  { id: "q8", text: "Auch wiederkehrende oder weniger spannende Aufgaben erledige ich zuverlässig.", dim: "sorgfalt" },
-  { id: "q9", text: "Neue Technik – Computer, Netzwerke, Systeme – finde ich spannend.", dim: "neugier" },
-  { id: "q10", text: "Ich lerne lieber ständig Neues dazu, als immer das Gleiche zu machen.", dim: "neugier" },
-  { id: "q11", text: "Mich interessiert, wie das Internet und Netzwerke eigentlich funktionieren.", dim: "netzwerk" },
-  { id: "q12", text: "Ich würde gern verstehen, wie viele Computer in einer Firma zu einem System zusammenspielen.", dim: "netzwerk" },
-  { id: "q13", text: "Mit Passwörtern und Zugängen gehe ich verantwortungsvoll und vorsichtig um.", dim: "verantwortung" },
-  { id: "q14", text: "Mir ist wichtig, dass Daten sicher sind und nicht in falsche Hände geraten.", dim: "verantwortung" },
-  { id: "q15", text: "Wenn etwas nicht funktioniert, bleibe ich ruhig und probiere weiter.", dim: "belastbarkeit" },
-  { id: "q16", text: "Auch wenn es stressig wird, behalte ich einen kühlen Kopf.", dim: "belastbarkeit" },
-  // Indirektere Fragen (Persönlichkeit/Interessen – weisen nicht direkt auf IT hin)
-  { id: "q17", text: "Ich baue, bastle oder repariere gern etwas mit den Händen – auch ausserhalb vom Computer.", dim: "hardware" },
-  { id: "q18", text: "Ich zeichne, gestalte oder tüftle gern an eigenen Ideen.", dim: "tuefteln" },
-  { id: "q19", text: "Knobelaufgaben und Rätsel reizen mich – ich bleibe dran, bis ich sie löse.", dim: "tuefteln" },
-  { id: "q20", text: "Wenn jemand Hilfe braucht, bin ich gern zur Stelle.", dim: "service" },
-  { id: "q21", text: "Ich arbeite gern mit anderen zusammen an einer Aufgabe.", dim: "service" },
-  { id: "q22", text: "Ich mag es, wenn Dinge geordnet sind und nichts vergessen geht.", dim: "sorgfalt" },
-  { id: "q23", text: "Ich will oft wissen, wie Sachen im Inneren funktionieren.", dim: "neugier" },
-  { id: "q24", text: "Wenn mir jemand etwas anvertraut, gehe ich besonders sorgfältig damit um.", dim: "verantwortung" },
-  // Umgekehrt gepolt – hier ist „trifft genau zu" die schlechte Antwort (gegen blindes Durchklicken)
-  { id: "r1", text: "Wenn etwas nicht sofort klappt, verliere ich schnell die Lust.", dim: "belastbarkeit", reverse: true },
-  { id: "r2", text: "Anleitungen lesen finde ich mühsam – ich lege lieber gleich drauflos.", dim: "sorgfalt", reverse: true },
-  { id: "r3", text: "Mit Schrauben, Kabeln und Geräten zu hantieren ist eher nichts für mich.", dim: "hardware", reverse: true },
-  { id: "r4", text: "Bei einem kniffligen Problem gebe ich lieber schnell auf, statt lange zu suchen.", dim: "tuefteln", reverse: true },
-  { id: "r5", text: "Wie Technik im Inneren funktioniert, interessiert mich eigentlich kaum.", dim: "neugier", reverse: true },
-  { id: "r6", text: "Wenn jemand gestresst Hilfe braucht, werde ich schnell ungeduldig.", dim: "service", reverse: true },
+  { id: "q1", text: "Ich baue, repariere oder bastle gern an Geräten – auch in der Freizeit.", dim: "hardware" },
+  { id: "q2", text: "Ich will oft wissen, wie ein Gerät oder ein Programm im Inneren funktioniert.", dim: "neugier" },
+  { id: "q3", text: "Knobel-, Logik- oder Strategiespiele machen mir Spass.", dim: "tuefteln" },
+  { id: "q4", text: "Es macht mir Freude, jemandem bei einem Problem zu helfen.", dim: "service" },
+  { id: "q5", text: "Immer dasselbe sauber und genau zu erledigen, finde ich eher langweilig.", dim: "sorgfalt", reverse: true },
+  { id: "q6", text: "Mich interessiert, wie Computer, Handys und das Internet zusammenhängen.", dim: "netzwerk" },
+  { id: "q7", text: "Auch wenn eine Aufgabe mühsam wird, bleibe ich dran.", dim: "belastbarkeit" },
+  { id: "q8", text: "Ich packe gern mit den Händen an, statt nur am Bildschirm zu sitzen.", dim: "hardware" },
+  { id: "q9", text: "Mit Passwörtern und persönlichen Daten gehe ich sorgfältig um.", dim: "verantwortung" },
+  { id: "q10", text: "Bei einem schwierigen Problem hole ich lieber sofort Hilfe, statt selbst zu suchen.", dim: "tuefteln", reverse: true },
+  { id: "q11", text: "Neue Technik auszuprobieren reizt mich.", dim: "neugier" },
+  { id: "q12", text: "Ich kann gut erklären, damit andere etwas verstehen.", dim: "service" },
+  { id: "q13", text: "Mir fällt auf, wenn ein kleines Detail nicht stimmt.", dim: "sorgfalt" },
+  { id: "q14", text: "Wenn ein Fehler nach mehreren Versuchen immer noch da ist, würde ich am liebsten aufhören.", dim: "belastbarkeit", reverse: true },
+  { id: "q15", text: "Wie in einer Firma viele Geräte zu einem System zusammenarbeiten, finde ich spannend.", dim: "netzwerk" },
+  { id: "q16", text: "Wenn etwas nicht funktioniert, suche ich selber nach der Ursache, bevor ich aufgebe.", dim: "tuefteln" },
+  { id: "q17", text: "Wenn man sich auf mich verlässt, gebe ich mein Bestes.", dim: "verantwortung" },
+  { id: "q18", text: "Technik interessiert mich eigentlich nur, solange sie einfach von allein funktioniert.", dim: "neugier", reverse: true },
+  { id: "q19", text: "Ich arbeite lieber genau und sauber als schnell und ungefähr.", dim: "sorgfalt" },
+  { id: "q20", text: "Wenn etwas schiefgeht, bleibe ich ruhig statt mich zu ärgern.", dim: "belastbarkeit" },
 ];
 
 export const SKALA = [
@@ -587,27 +578,27 @@ export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 2: Wie ein Computer denkt ----------
   {
     id: "pc2", teil: "Wie ein Computer denkt", typ: "pseudocode",
-    intro: "«Pseudocode» ist ein Rezept in einfachen Schritten. Eine «Schleife» wiederholt Schritte mehrmals – das Herz fast jedes Programms. Lies von oben nach unten und rechne mit.",
-    frage: "Eine Schleife. Was steht am Ende in der Summe?",
-    zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 4:", "    zähle die Zahl zur Summe dazu", "Gib Summe aus"],
+    intro: "«Pseudocode» ist ein Rezept in einfachen Schritten. Eine «Schleife» wiederholt einen Schritt mehrmals. Beispiel: Du installierst 4 PCs und rechnest die Gesamtzeit zusammen – sie dauern 1, 2, 3 und 4 Minuten.",
+    frage: "Wie viele Minuten dauern alle 4 zusammen?",
+    zeilen: ["Gesamtzeit = 0 Minuten", "Für jeden der 4 PCs (1, 2, 3, 4 Min):", "    zähle seine Minuten zur Gesamtzeit dazu", "Zeige die Gesamtzeit"],
     optionen: [
       { text: "10", richtig: true },
       { text: "4", richtig: false },
       { text: "7", richtig: false },
     ],
-    aufloesung: "1 + 2 + 3 + 4 = 10. Eine Schleife wiederholt Schritte – das Herz fast jedes Programms.",
+    aufloesung: "1 + 2 + 3 + 4 = 10 Minuten. Eine Schleife wiederholt denselben Schritt für jeden PC.",
   },
   {
     id: "pc3", teil: "Wie ein Computer denkt", typ: "pseudocode",
-    intro: "Eine «Bedingung» (wenn … sonst …) lässt den Computer abzweigen – nur EIN Weg wird genommen. Welcher?",
-    frage: "Jetzt mit einer Bedingung. Wie viele Punkte am Ende?",
-    zeilen: ["Setze Punkte auf 0", "Wenn 8 grösser als 5 ist:", "    Punkte = Punkte + 10", "Sonst:", "    Punkte = Punkte + 1"],
+    intro: "Eine «Bedingung» (wenn … sonst …) lässt das Programm abzweigen – nur EIN Weg wird genommen. Beispiel: ein Quiz vergibt Punkte, je nachdem ob die Antwort richtig war.",
+    frage: "Wie viele Punkte gibt es hier?",
+    zeilen: ["Du startest mit 0 Punkten", "Wenn die Antwort richtig ist:", "    gib 10 Punkte dazu", "Sonst:", "    gib 1 Punkt dazu", "Die Antwort war richtig."],
     optionen: [
       { text: "10", richtig: true },
       { text: "1", richtig: false },
       { text: "11", richtig: false },
     ],
-    aufloesung: "8 ist grösser als 5 → nur der erste Fall greift → 10. Der «Sonst»-Weg wird gar nicht erst betreten.",
+    aufloesung: "Die Antwort war richtig → nur der erste Weg greift → 10 Punkte. Der «Sonst»-Weg wird nicht betreten.",
   },
   {
     id: "err1", teil: "Wie ein Computer denkt", typ: "fehler",
