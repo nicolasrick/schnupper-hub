@@ -498,7 +498,7 @@ function SequenzView({ e, frag, onSolve }: { e: EinsatzSequenz; frag: string; on
         onChange={(ev) => { setWert(ev.target.value.replace(/[^0-9]/g, "")); setStatus("offen"); }}
         placeholder="Nächste Zahl"
         disabled={status === "richtig"}
-        className="mx-auto mt-6 block w-40 rounded-2xl border border-line px-5 py-3 text-center text-xl font-bold tabular-nums outline-none focus:border-green focus:ring-4 focus:ring-green/20"
+        className="mx-auto mt-6 block w-full max-w-xs rounded-2xl border border-line px-5 py-3 text-center text-xl font-bold tabular-nums outline-none focus:border-green focus:ring-4 focus:ring-green/20"
       />
       {status === "falsch" && <p className="mt-3 rounded-2xl bg-amber/10 px-4 py-3 text-center text-sm text-amber">Noch nicht. Tipp: {e.hinweis}</p>}
       {status === "richtig" && <Fragment frag={frag} />}
