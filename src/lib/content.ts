@@ -607,18 +607,6 @@ export const CHECK_ITEMS: CheckItem[] = [
     aufloesung: "1 + 2 + 3 + 4 = 10 Minuten. Eine Schleife wiederholt denselben Schritt für jeden PC.",
   },
   {
-    id: "pc3", teil: "Wie ein Computer denkt", typ: "pseudocode",
-    intro: "Eine «Bedingung» (wenn … sonst …) lässt das Programm abzweigen – nur EIN Weg wird genommen. Beispiel: ein Quiz vergibt Punkte, je nachdem ob die Antwort richtig war.",
-    frage: "Wie viele Punkte gibt es hier?",
-    zeilen: ["Du startest mit 0 Punkten", "Wenn die Antwort richtig ist:", "    gib 10 Punkte dazu", "Sonst:", "    gib 1 Punkt dazu", "Die Antwort war richtig."],
-    optionen: [
-      { text: "10", richtig: true },
-      { text: "1", richtig: false },
-      { text: "11", richtig: false },
-    ],
-    aufloesung: "Die Antwort war richtig → nur der erste Weg greift → 10 Punkte. Der «Sonst»-Weg wird nicht betreten.",
-  },
-  {
     id: "err1", teil: "Wie ein Computer denkt", typ: "fehler",
     intro: "Mit dem Befehl «ping» prüft man, ob ein Gerät im Netzwerk erreichbar ist – jedes Gerät hat dafür eine Adresse (IP) aus vier Zahlen. Dieses Skript pingt drei Geräte der Reihe nach an.",
     frage: "Welche Zeile kann unmöglich funktionieren?",
@@ -736,18 +724,6 @@ export const CHECK_ITEMS: CheckItem[] = [
 
 // Freiwillige, schwerere Bonus-Runde – fordert die schon Erfahrenen.
 export const BONUS_ITEMS: CheckItem[] = [
-  {
-    id: "b-pc", teil: "Knifflig zum Schluss", typ: "pseudocode",
-    frage: "Eine Schleife mit Bedingung. Welche Zahl steht am Ende in der Summe?",
-    zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 3:", "    wenn die Zahl gerade ist: Summe = Summe + 10", "    sonst: Summe = Summe + 1", "Gib Summe aus"],
-    optionen: [
-      { text: "12", richtig: true },
-      { text: "30", richtig: false },
-      { text: "33", richtig: false },
-    ],
-    aufloesung: "1 ist ungerade (+1 → 1), 2 ist gerade (+10 → 11), 3 ist ungerade (+1 → 12). Bedingung pro Durchgang neu prüfen!",
-    tipp: "Geh die Zahlen 1, 2, 3 einzeln durch und entscheide jedes Mal: gerade (+10) oder ungerade (+1)?",
-  },
   {
     id: "b-net", teil: "Knifflig zum Schluss", typ: "triage",
     intro: "Dein PC hat die Adresse 192.168.1.50. Drei andere Geräte hängen am Netz.",
