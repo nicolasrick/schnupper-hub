@@ -17,42 +17,34 @@ type SolveFn = (r: LosResult) => void;
  *  Jede Aufgabe = ein Screen → der Fortschritt stimmt. Wer eine Hilfe nutzt oder
  *  mehrere Anläufe braucht, zählt nicht als „selbstständig" – das fliesst ins Ergebnis. */
 export function EignungsCheck({ onDone }: { onDone: (e: CheckErgebnis) => void }) {
-  const N = CHECK_ITEMS.length;
-  const B = BONUS_ITEMS.length;
-  const OFFER = N + 1;
-  // 0 = Intro, 1..N = Pflicht, OFFER = Bonus-Angebot, OFFER+1..OFFER+B = Bonus
+  // Ein durchgehender Test: Pflichtaufgaben + die kniffligen am Schluss, am Stück.
+  const ALLE = [...CHECK_ITEMS, ...BONUS_ITEMS];
+  const N = ALLE.length;
+  // 0 = Intro, 1..N = Aufgaben
   const [schritt, setSchritt] = useState(0);
   const [records, setRecords] = useState<Record<string, LosResult>>({});
-  const [bonus, setBonus] = useState(false);
 
-  function finish(rec: Record<string, LosResult>, bonusGemacht: boolean) {
-    const selbststaendig = CHECK_ITEMS.filter((i) => rec[i.id]?.selbststaendig).length;
-    const tipps = CHECK_ITEMS.filter((i) => rec[i.id]?.tipp).length;
-    const teile = [...new Set(CHECK_ITEMS.map((i) => i.teil))];
+  function finish(rec: Record<string, LosResult>) {
+    const selbststaendig = ALLE.filter((i) => rec[i.id]?.selbststaendig).length;
+    const tipps = ALLE.filter((i) => rec[i.id]?.tipp).length;
+    const teile = [...new Set(ALLE.map((i) => i.teil))];
     const starkeTeile = teile.filter((t) =>
-      CHECK_ITEMS.filter((i) => i.teil === t).every((i) => rec[i.id]?.selbststaendig)
+      ALLE.filter((i) => i.teil === t).every((i) => rec[i.id]?.selbststaendig)
     );
-    const bonusSelbststaendig = BONUS_ITEMS.filter((i) => rec[i.id]?.selbststaendig).length;
-    onDone({ total: N, selbststaendig, tipps, starkeTeile, bonusGemacht, bonusTotal: bonusGemacht ? B : 0, bonusSelbststaendig });
+    onDone({ total: N, selbststaendig, tipps, starkeTeile, bonusGemacht: false, bonusTotal: 0, bonusSelbststaendig: 0 });
   }
 
   function loese(id: string, r: LosResult) {
     const rec = { ...records, [id]: r };
     setRecords(rec);
     if (schritt < N) setSchritt(schritt + 1);
-    else if (schritt === N) setSchritt(OFFER);          // letzte Pflicht → Bonus-Angebot
-    else if (schritt < OFFER + B) setSchritt(schritt + 1); // Bonus → nächste Bonus
-    else finish(rec, true);                              // letzte Bonus → fertig
+    else finish(rec);
   }
 
-  let item: CheckItem | null = null;
-  if (schritt >= 1 && schritt <= N) item = CHECK_ITEMS[schritt - 1];
-  else if (schritt > OFFER && schritt <= OFFER + B) item = BONUS_ITEMS[schritt - OFFER - 1];
-
-  const istBonus = schritt > OFFER;
-  const teilLabel = istBonus ? "Vertiefung" : item?.teil ?? "Logik & Muster";
-  const fortschritt = istBonus ? (schritt - OFFER - 1) / B : (schritt - 1) / N;
-  const zaehler = istBonus ? `Vertiefung ${schritt - OFFER} von ${B}` : `Aufgabe ${schritt} von ${N}`;
+  const item: CheckItem | null = schritt >= 1 && schritt <= N ? ALLE[schritt - 1] : null;
+  const teilLabel = item?.teil ?? "Logik & Muster";
+  const fortschritt = (schritt - 1) / N;
+  const zaehler = `Aufgabe ${schritt} von ${N}`;
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -79,11 +71,15 @@ export function EignungsCheck({ onDone }: { onDone: (e: CheckErgebnis) => void }
       {item?.typ === "cipher" && <CipherView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "befehle" && <BefehleView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
 
-      {schritt === OFFER && (
-        <BonusAngebot
-          onJa={() => { setBonus(true); setSchritt(OFFER + 1); }}
-          onNein={() => finish(records, false)}
-        />
+      {item && (
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => loese(item.id, { selbststaendig: false, tipp: false })}
+            className="text-sm text-white/50 underline-offset-2 transition hover:text-white/80 hover:underline"
+          >
+            Komme nicht weiter – Aufgabe überspringen →
+          </button>
+        </div>
       )}
     </div>
   );
@@ -108,35 +104,17 @@ function Hilfe({ text, offen, onOeffnen }: { text: string; offen: boolean; onOef
 function Intro({ total, onNext }: { total: number; onNext: () => void }) {
   return (
     <Card className="p-8 text-center sm:p-10">
-      <p className="text-sm font-bold uppercase tracking-[0.2em] text-green">Eignungs-Check</p>
-      <h2 className="mt-2 text-3xl font-bold">Berufsrelevante Fähigkeiten</h2>
+      <p className="text-sm font-bold uppercase tracking-[0.2em] text-green">Berufswahl-Analyse</p>
+      <h2 className="mt-2 text-3xl font-bold">Der grosse Test</h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
-        {total} Aufgaben in mehreren Bereichen – logisches Denken, strukturiertes
-        Vorgehen, Priorisieren, IT-Sicherheit und Urteilsvermögen im Anwendersupport.
-        Vor jeder Aufgabe steht, worum es geht und warum es im Beruf zählt. Kein Vorwissen
-        nötig: Kommst du nicht weiter, kannst du einen Tipp abrufen – ob du Hilfe
-        brauchst, fliesst in deine Auswertung ein.
+        {total} Aufgaben am Stück – logisches Denken, strukturiertes Vorgehen,
+        Priorisieren, IT-Sicherheit und Urteilsvermögen, bis hin zu ein paar
+        kniffligen zum Schluss. Vor jeder Aufgabe steht, worum es geht und warum
+        es im Beruf zählt. Kein Vorwissen nötig: Kommst du nicht weiter, hol dir
+        einen Tipp oder überspring die Aufgabe – beides ist völlig okay.
       </p>
       <div className="mt-8 flex justify-center">
-        <Button onClick={onNext}>Check starten →</Button>
-      </div>
-    </Card>
-  );
-}
-
-function BonusAngebot({ onJa, onNein }: { onJa: () => void; onNein: () => void }) {
-  return (
-    <Card className="p-8 text-center sm:p-10">
-      <p className="text-sm font-bold uppercase tracking-[0.2em] text-green">Vertiefung</p>
-      <h2 className="mt-2 text-3xl font-bold">Pflichtteil abgeschlossen</h2>
-      <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
-        Möchtest du dich an einigen anspruchsvolleren Aufgaben versuchen? Sie sind
-        freiwillig und gehen bewusst tiefer. Auch wenn du sie nicht alle löst,
-        zeigt dein Vorgehen schon viel.
-      </p>
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Button onClick={onJa}>Weitermachen →</Button>
-        <Button variant="ghost" onClick={onNein}>Hier abschliessen</Button>
+        <Button onClick={onNext}>Los geht&apos;s →</Button>
       </div>
     </Card>
   );

@@ -119,27 +119,30 @@ export interface Frage {
   /** Umgekehrt gepolt: hier ist „trifft genau zu" die schlechte Antwort.
    *  Verhindert, dass blindes „immer trifft genau zu" gewinnt – man muss lesen. */
   reverse?: boolean;
+  /** Wenn gesetzt: als Schieberegler mit diesen Polen darstellen (mehr Abwechslung
+   *  als die 4 Knöpfe). Wert bleibt 0–3, Scoring identisch. Nur für nicht-reverse-Fragen. */
+  slider?: { links: string; rechts: string };
 }
 
 // Echte Berufswahl-Analyse: Interessen, Arbeitsweise & Situationen – jede Frage
 // einmal, kein „Anfang = Ende umgekehrt". Wenige umgekehrt gepolte Fragen sind
 // VERSTREUT und situativ formuliert (gegen blindes Durchklicken).
 export const FRAGEN: Frage[] = [
-  { id: "q1", text: "Ich baue, repariere oder bastle gern an Geräten – auch in der Freizeit.", dim: "hardware" },
+  { id: "q1", text: "Ich baue, repariere oder bastle gern an Geräten – auch in der Freizeit.", dim: "hardware", slider: { links: "Überhaupt nicht", rechts: "Total gern" } },
   { id: "q2", text: "Ich will oft wissen, wie ein Gerät oder ein Programm im Inneren funktioniert.", dim: "neugier" },
-  { id: "q3", text: "Knobel-, Logik- oder Strategiespiele machen mir Spass.", dim: "tuefteln" },
-  { id: "q4", text: "Es macht mir Freude, jemandem bei einem Problem zu helfen.", dim: "service" },
+  { id: "q3", text: "Knobel-, Logik- oder Strategiespiele machen mir Spass.", dim: "tuefteln", slider: { links: "Langweilt mich", rechts: "Liebe ich" } },
+  { id: "q4", text: "Es macht mir Freude, jemandem bei einem Problem zu helfen.", dim: "service", slider: { links: "Eher nicht", rechts: "Sehr gern" } },
   { id: "q5", text: "Immer dasselbe sauber und genau zu erledigen, finde ich eher langweilig.", dim: "sorgfalt", reverse: true },
   { id: "q6", text: "Mich interessiert, wie Computer, Handys und das Internet zusammenhängen.", dim: "netzwerk" },
   { id: "q7", text: "Auch wenn eine Aufgabe mühsam wird, bleibe ich dran.", dim: "belastbarkeit" },
   { id: "q8", text: "Ich packe gern mit den Händen an, statt nur am Bildschirm zu sitzen.", dim: "hardware" },
   { id: "q9", text: "Mit Passwörtern und persönlichen Daten gehe ich sorgfältig um.", dim: "verantwortung" },
   { id: "q10", text: "Bei einem schwierigen Problem hole ich lieber sofort Hilfe, statt selbst zu suchen.", dim: "tuefteln", reverse: true },
-  { id: "q11", text: "Neue Technik auszuprobieren reizt mich.", dim: "neugier" },
+  { id: "q11", text: "Neue Technik auszuprobieren reizt mich.", dim: "neugier", slider: { links: "Reizt mich nicht", rechts: "Mega spannend" } },
   { id: "q12", text: "Ich kann gut erklären, damit andere etwas verstehen.", dim: "service" },
   { id: "q13", text: "Mir fällt auf, wenn ein kleines Detail nicht stimmt.", dim: "sorgfalt" },
   { id: "q14", text: "Wenn ein Fehler nach mehreren Versuchen immer noch da ist, würde ich am liebsten aufhören.", dim: "belastbarkeit", reverse: true },
-  { id: "q15", text: "Wie in einer Firma viele Geräte zu einem System zusammenarbeiten, finde ich spannend.", dim: "netzwerk" },
+  { id: "q15", text: "Wie in einer Firma viele Geräte zu einem System zusammenarbeiten, finde ich spannend.", dim: "netzwerk", slider: { links: "Interessiert mich nicht", rechts: "Finde ich faszinierend" } },
   { id: "q16", text: "Wenn etwas nicht funktioniert, suche ich selber nach der Ursache, bevor ich aufgebe.", dim: "tuefteln" },
   { id: "q17", text: "Wenn man sich auf mich verlässt, gebe ich mein Bestes.", dim: "verantwortung" },
   { id: "q18", text: "Technik interessiert mich eigentlich nur, solange sie einfach von allein funktioniert.", dim: "neugier", reverse: true },
@@ -482,7 +485,7 @@ export type CheckTeil =
   | "Einordnen & Priorisieren"
   | "Praxis im ServiceDesk"
   | "Sicherheit im Blick"
-  | "Vertiefung";
+  | "Knifflig zum Schluss";
 
 /** Professionelle Kurz-Erklärung pro Bereich: was wird hier erfasst, warum ist
  *  es berufsrelevant. Wird über jeder Aufgabe gezeigt – so ist die Aufgabe
@@ -498,8 +501,8 @@ export const TEIL_INFO: Record<CheckTeil, string> = {
     "Hier zählt dein Urteilsvermögen in echten Situationen: erst verstehen, dann handeln – die Grundhaltung im Anwendersupport.",
   "Sicherheit im Blick":
     "Hier geht es um IT-Sicherheit und Aufmerksamkeit. In der IT trägst du Verantwortung für fremde Daten – Betrugsversuche erkennen und sichere Passwörter wählen gehört zum Handwerk.",
-  "Vertiefung":
-    "Aufgaben für Fortgeschrittene. Sie gehen bewusst tiefer und sind freiwillig – verstehen reicht, lösen ist die Kür.",
+  "Knifflig zum Schluss":
+    "Zum Abschluss ein paar härtere Nüsse. Sie gehen bewusst tiefer – verstehen reicht, lösen ist die Kür. Wenn du nicht weiterkommst, kannst du eine Aufgabe überspringen.",
 };
 
 interface CheckBasis {
@@ -734,7 +737,7 @@ export const CHECK_ITEMS: CheckItem[] = [
 // Freiwillige, schwerere Bonus-Runde – fordert die schon Erfahrenen.
 export const BONUS_ITEMS: CheckItem[] = [
   {
-    id: "b-pc", teil: "Vertiefung", typ: "pseudocode",
+    id: "b-pc", teil: "Knifflig zum Schluss", typ: "pseudocode",
     frage: "Eine Schleife mit Bedingung. Welche Zahl steht am Ende in der Summe?",
     zeilen: ["Setze Summe auf 0", "Für jede Zahl von 1 bis 3:", "    wenn die Zahl gerade ist: Summe = Summe + 10", "    sonst: Summe = Summe + 1", "Gib Summe aus"],
     optionen: [
@@ -746,7 +749,7 @@ export const BONUS_ITEMS: CheckItem[] = [
     tipp: "Geh die Zahlen 1, 2, 3 einzeln durch und entscheide jedes Mal: gerade (+10) oder ungerade (+1)?",
   },
   {
-    id: "b-net", teil: "Vertiefung", typ: "triage",
+    id: "b-net", teil: "Knifflig zum Schluss", typ: "triage",
     intro: "Dein PC hat die Adresse 192.168.1.50. Drei andere Geräte hängen am Netz.",
     frage: "Welches Gerät ist NICHT im selben Netzwerk wie dein PC?",
     optionen: [
@@ -757,7 +760,7 @@ export const BONUS_ITEMS: CheckItem[] = [
     tipp: "Vergleiche die ersten drei Zahlen-Blöcke (192.168.1). Wo weicht einer ab?",
   },
   {
-    id: "b-seq", teil: "Vertiefung", typ: "sequenz",
+    id: "b-seq", teil: "Knifflig zum Schluss", typ: "sequenz",
     frage: "Wie geht diese Reihe weiter?",
     folge: [1, 1, 2, 3, 5, 8],
     loesung: 13,
@@ -765,13 +768,22 @@ export const BONUS_ITEMS: CheckItem[] = [
     tipp: "Jede Zahl ist die Summe der beiden vorherigen (das ist die berühmte Fibonacci-Reihe).",
   },
   {
-    id: "robo2", teil: "Vertiefung", typ: "befehle",
+    id: "robo2", teil: "Knifflig zum Schluss", typ: "befehle",
     intro: "Diesmal steht eine Wand im Weg. Der direkte Weg ist versperrt – der Roboter muss aussen herum.",
     frage: "Führ den Roboter um die Wand herum zur Kiste.",
     breite: 4, hoehe: 3, start: { x: 0, y: 0 }, ziel: { x: 3, y: 0 },
     wand: [{ x: 1, y: 0 }, { x: 2, y: 0 }],
     erklaerung: "Sauber umschifft. Manchmal ist der direkte Weg blockiert und du musst einen Umweg planen – genau so denkt man in der IT.",
     tipp: "Nach rechts geht nicht (Wand). Geh erst runter, dann nach rechts, dann wieder hoch.",
+  },
+  {
+    id: "robo3", teil: "Knifflig zum Schluss", typ: "befehle",
+    intro: "Letzte Roboter-Mission – jetzt steht eine Wand mittendrin. Plan die ganze Route im Kopf, bevor du startest.",
+    frage: "Steuer den Roboter um die Wand herum zur Kiste.",
+    breite: 4, hoehe: 3, start: { x: 0, y: 0 }, ziel: { x: 3, y: 0 },
+    wand: [{ x: 1, y: 0 }, { x: 1, y: 1 }],
+    erklaerung: "Stark gelöst – du hast die Route vorausgedacht und sauber ausgeführt. Genau diese Planung steckt hinter jedem Programm.",
+    tipp: "Spalte 1 ist oben und in der Mitte dicht. Geh ganz runter, dann nach rechts, dann wieder hoch.",
   },
 ];
 
