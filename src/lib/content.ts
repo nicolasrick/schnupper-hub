@@ -481,6 +481,7 @@ export type CheckTeil =
   | "Wie ein Computer denkt"
   | "Einordnen & Priorisieren"
   | "Praxis im ServiceDesk"
+  | "Sicherheit im Blick"
   | "Vertiefung";
 
 /** Professionelle Kurz-Erklärung pro Bereich: was wird hier erfasst, warum ist
@@ -495,6 +496,8 @@ export const TEIL_INFO: Record<CheckTeil, string> = {
     "Hier geht es ums Priorisieren. Treffen mehrere Störungen gleichzeitig ein, entscheidet die richtige Reihenfolge über Wirkung und Zeit.",
   "Praxis im ServiceDesk":
     "Hier zählt dein Urteilsvermögen in echten Situationen: erst verstehen, dann handeln – die Grundhaltung im Anwendersupport.",
+  "Sicherheit im Blick":
+    "Hier geht es um IT-Sicherheit und Aufmerksamkeit. In der IT trägst du Verantwortung für fremde Daten – Betrugsversuche erkennen und sichere Passwörter wählen gehört zum Handwerk.",
   "Vertiefung":
     "Aufgaben für Fortgeschrittene. Sie gehen bewusst tiefer und sind freiwillig – verstehen reicht, lösen ist die Kür.",
 };
@@ -548,9 +551,21 @@ export interface CheckZuordnung extends CheckBasis {
 export interface CheckCipher extends CheckBasis {
   typ: "cipher"; frage: string; chiffre: string; loesung: string[]; hinweis: string;
 }
+/** Roboter-Befehle aneinanderreihen – algorithmisches Denken („programmieren in klein").
+ *  Gitter mit 0,0 = oben links; der Roboter folgt der Befehlsfolge Schritt für Schritt. */
+export interface CheckBefehle extends CheckBasis {
+  typ: "befehle"; intro: string; frage: string;
+  breite: number; hoehe: number;
+  start: { x: number; y: number };
+  ziel: { x: number; y: number };
+  /** Optionale Hindernisse, die der Roboter nicht betreten darf. */
+  wand?: { x: number; y: number }[];
+  /** Erfolgs-Text nach gelöstem Lauf. */
+  erklaerung: string;
+}
 export type CheckItem =
   | CheckBituhr | CheckSequenz | CheckPseudocode | CheckFehler
-  | CheckRanking | CheckTriage | CheckZuordnung | CheckCipher;
+  | CheckRanking | CheckTriage | CheckZuordnung | CheckCipher | CheckBefehle;
 
 export const CHECK_ITEMS: CheckItem[] = [
   // ---------- Teil 1: Logik & Muster ----------
@@ -620,6 +635,14 @@ export const CHECK_ITEMS: CheckItem[] = [
     hinweis: "V → U → T → S. Mach das mit jedem Buchstaben. Nutz die Alphabet-Leiste unten.",
     tipp: "Geh pro Buchstabe 3 Schritte im Alphabet zurück. V wird zu S, W wird zu T …",
   },
+  {
+    id: "robo1", teil: "Wie ein Computer denkt", typ: "befehle",
+    intro: "Ein Roboter folgt Befehlen – einen nach dem anderen, genau in der Reihenfolge, die du vorgibst. Das ist Programmieren in klein.",
+    frage: "Stell die Befehle so zusammen, dass der Roboter zur Kiste läuft – dann starte ihn.",
+    breite: 4, hoehe: 3, start: { x: 0, y: 2 }, ziel: { x: 3, y: 0 },
+    erklaerung: "Genau. Der Roboter macht exakt das, was du ihm der Reihe nach sagst – die Reihenfolge entscheidet.",
+    tipp: "Zähl die Schritte: 3-mal nach rechts und 2-mal nach oben bringen ihn zur Kiste. Reihenfolge egal, solange er ankommt.",
+  },
   // ---------- Teil 3: Einordnen & Priorisieren ----------
   {
     id: "rank1", teil: "Einordnen & Priorisieren", typ: "ranking",
@@ -683,6 +706,29 @@ export const CHECK_ITEMS: CheckItem[] = [
     richtig: "Feuerwehr",
     erklaerung: "Die Feuerwehr braucht zuverlässige Technik, die auch im Einsatz funktioniert.",
   },
+  // ---------- Teil 5: Sicherheit im Blick ----------
+  {
+    id: "sec-phish", teil: "Sicherheit im Blick", typ: "triage",
+    intro: "Drei E-Mails landen im Postfach der Stadtverwaltung. Eine ist eine Fälschung («Phishing») und will an ein Passwort.",
+    frage: "Welche Mail ist die gefährliche Fälschung?",
+    optionen: [
+      { text: "it-support@stadt.sg.ch – «Wartung heute Abend, du musst nichts tun.»", richtig: false, feedback: "Die ist echt: bekannte Stadt-Adresse und sie will nichts von dir." },
+      { text: "sicherheit@stadt-sg-login.com – «Ihr Konto wird gesperrt! Sofort hier klicken und Passwort eingeben.»", richtig: true, feedback: "Richtig erkannt. Fremde Adresse (stadt-sg-login.com statt stadt.sg.ch), Drohung, Zeitdruck und Passwort-Abfrage – die typischen Phishing-Zeichen." },
+      { text: "kollegin@stadt.sg.ch – «Hast du das Protokoll von gestern?»", richtig: false, feedback: "Harmlose interne Mail von einer bekannten Adresse." },
+    ],
+    tipp: "Schau auf die Absender-Adresse und ob die Mail dich unter Druck setzt, schnell ein Passwort einzugeben.",
+  },
+  {
+    id: "sec-pw", teil: "Sicherheit im Blick", typ: "triage",
+    intro: "Du richtest ein neues Konto ein und musst ein Passwort vergeben.",
+    frage: "Welches Passwort ist am sichersten?",
+    optionen: [
+      { text: "passwort123", richtig: false, feedback: "Steht auf jeder Liste der schlechtesten Passwörter – in Sekunden geknackt." },
+      { text: "Sommer2026", richtig: false, feedback: "Zu kurz und zu erratbar: ein Wort plus Jahreszahl knacken Programme schnell." },
+      { text: "7Koffer!blau-Velo", richtig: true, feedback: "Stark: lang, mischt Wörter, Zahlen und Zeichen und ergibt für Fremde keinen Sinn – du selbst kannst es dir aber als Bild merken." },
+    ],
+    tipp: "Je länger und je weniger erratbar (kein echtes Wort, kein Geburtsjahr), desto besser.",
+  },
 ];
 
 // Freiwillige, schwerere Bonus-Runde – fordert die schon Erfahrenen.
@@ -717,6 +763,15 @@ export const BONUS_ITEMS: CheckItem[] = [
     loesung: 13,
     hinweis: "Zähl die letzten zwei Zahlen zusammen: 5 + 8 = ?",
     tipp: "Jede Zahl ist die Summe der beiden vorherigen (das ist die berühmte Fibonacci-Reihe).",
+  },
+  {
+    id: "robo2", teil: "Vertiefung", typ: "befehle",
+    intro: "Diesmal steht eine Wand im Weg. Der direkte Weg ist versperrt – der Roboter muss aussen herum.",
+    frage: "Führ den Roboter um die Wand herum zur Kiste.",
+    breite: 4, hoehe: 3, start: { x: 0, y: 0 }, ziel: { x: 3, y: 0 },
+    wand: [{ x: 1, y: 0 }, { x: 2, y: 0 }],
+    erklaerung: "Sauber umschifft. Manchmal ist der direkte Weg blockiert und du musst einen Umweg planen – genau so denkt man in der IT.",
+    tipp: "Nach rechts geht nicht (Wand). Geh erst runter, dann nach rechts, dann wieder hoch.",
   },
 ];
 

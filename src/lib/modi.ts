@@ -34,7 +34,7 @@ export const MODI: Modus[] = [
     begruessung: "Willkommen am Schnuppertag 👋",
     intro: "Hier findest du alles an einem Ort: Analyse, Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
-    analyseDauer: "ca. 15 Min",
+    analyseDauer: "ca. 25 Min",
   },
   {
     id: "nachmittag",
@@ -44,7 +44,7 @@ export const MODI: Modus[] = [
     begruessung: "Willkommen zu eurem IT-Nachmittag 👋",
     intro: "Alles an einem Ort: Analyse, Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
-    analyseDauer: "ca. 15 Min",
+    analyseDauer: "ca. 25 Min",
   },
   {
     id: "zukunftstag",
@@ -54,7 +54,7 @@ export const MODI: Modus[] = [
     begruessung: "Willkommen am Zukunftstag 👋",
     intro: "Hier entdeckst du echte IT-Arbeit: dein Profil, die Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
-    analyseDauer: "ca. 15 Min",
+    analyseDauer: "ca. 25 Min",
     hinweis: "Für junge Entdecker:innen am Zukunftstag.",
   },
   {
@@ -65,7 +65,7 @@ export const MODI: Modus[] = [
     begruessung: "Willkommen im Triebwerk 👋",
     intro: "IT zum Anfassen: dein Profil, die Mission und die Aufgaben.",
     karten: ["analyse", "mission", "aufgaben", "abgabe", "infos"],
-    analyseDauer: "ca. 15 Min",
+    analyseDauer: "ca. 25 Min",
   },
 ];
 

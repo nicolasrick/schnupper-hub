@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   CHECK_ITEMS, BONUS_ITEMS, TEIL_INFO, CheckErgebnis, KUNDEN, BIT_WERTE,
-  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckCipher, CheckItem,
+  CheckBituhr, CheckSequenz, CheckPseudocode, CheckFehler, CheckRanking, CheckTriage, CheckZuordnung, CheckCipher, CheckBefehle, CheckItem,
 } from "@/lib/content";
 import { Card, Button, Fortschritt } from "./ui";
 
@@ -77,6 +77,7 @@ export function EignungsCheck({ onDone }: { onDone: (e: CheckErgebnis) => void }
       {item?.typ === "triage" && <TriageView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "zuordnung" && <ZuordnungView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
       {item?.typ === "cipher" && <CipherView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
+      {item?.typ === "befehle" && <BefehleView key={item.id} e={item} kicker={teilLabel} onNext={(r) => loese(item!.id, r)} />}
 
       {schritt === OFFER && (
         <BonusAngebot
@@ -110,9 +111,9 @@ function Intro({ total, onNext }: { total: number; onNext: () => void }) {
       <p className="text-sm font-bold uppercase tracking-[0.2em] text-green">Eignungs-Check</p>
       <h2 className="mt-2 text-3xl font-bold">Berufsrelevante Fähigkeiten</h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-ink-soft">
-        {total} Aufgaben in vier Bereichen – logisches Denken, strukturiertes
-        Vorgehen, Priorisieren und Urteilsvermögen im Anwendersupport. Vor jeder
-        Aufgabe steht, worum es geht und warum es im Beruf zählt. Kein Vorwissen
+        {total} Aufgaben in mehreren Bereichen – logisches Denken, strukturiertes
+        Vorgehen, Priorisieren, IT-Sicherheit und Urteilsvermögen im Anwendersupport.
+        Vor jeder Aufgabe steht, worum es geht und warum es im Beruf zählt. Kein Vorwissen
         nötig: Kommst du nicht weiter, kannst du einen Tipp abrufen – ob du Hilfe
         brauchst, fliesst in deine Auswertung ein.
       </p>
@@ -504,6 +505,139 @@ function CipherView({ e, kicker, onNext }: { e: CheckCipher; kicker: string; onN
         {status === "richtig"
           ? <Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button>
           : <Button onClick={pruefen} disabled={wert.trim().length === 0}>Entschlüsseln</Button>}
+      </div>
+    </Card>
+  );
+}
+
+/* ---------- Roboter-Befehle (algorithmisches Denken) ---------- */
+type Dir = "up" | "down" | "left" | "right";
+const BEFEHLE: { d: Dir; icon: string; label: string; dx: number; dy: number }[] = [
+  { d: "left", icon: "⬅️", label: "Links", dx: -1, dy: 0 },
+  { d: "up", icon: "⬆️", label: "Hoch", dx: 0, dy: -1 },
+  { d: "down", icon: "⬇️", label: "Runter", dx: 0, dy: 1 },
+  { d: "right", icon: "➡️", label: "Rechts", dx: 1, dy: 0 },
+];
+const ICON: Record<Dir, string> = { up: "⬆️", down: "⬇️", left: "⬅️", right: "➡️" };
+
+function BefehleView({ e, kicker, onNext }: { e: CheckBefehle; kicker: string; onNext: SolveFn }) {
+  const [prog, setProg] = useState<Dir[]>([]);
+  const [status, setStatus] = useState<"bauen" | "laeuft" | "erfolg" | "fehler">("bauen");
+  const [robot, setRobot] = useState(e.start);
+  const [fehler, setFehler] = useState(0);
+  const [tipp, setTipp] = useState(false);
+  const [meldung, setMeldung] = useState("");
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Laufender Timer wird beim Verlassen sauber gestoppt.
+  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+
+  const istWand = (x: number, y: number) => (e.wand ?? []).some((w) => w.x === x && w.y === y);
+  const laeuft = status === "laeuft";
+
+  function reset(p: Dir[]) { setProg(p); setStatus("bauen"); setRobot(e.start); setMeldung(""); }
+  function add(d: Dir) { if (laeuft || status === "erfolg") return; reset([...prog, d]); }
+  function undo() { if (laeuft || status === "erfolg") return; reset(prog.slice(0, -1)); }
+  function leeren() { if (laeuft || status === "erfolg") return; reset([]); }
+
+  function starten() {
+    if (laeuft || status === "erfolg" || prog.length === 0) return;
+    // Pfad vorab berechnen, inkl. Abbruch bei Wand/Rand.
+    const pfad = [e.start];
+    let cur = e.start;
+    let problem: "raus" | "wand" | null = null;
+    for (const d of prog) {
+      const m = BEFEHLE.find((b) => b.d === d)!;
+      const nx = cur.x + m.dx, ny = cur.y + m.dy;
+      if (nx < 0 || ny < 0 || nx >= e.breite || ny >= e.hoehe) { problem = "raus"; break; }
+      if (istWand(nx, ny)) { problem = "wand"; break; }
+      cur = { x: nx, y: ny };
+      pfad.push(cur);
+    }
+    setStatus("laeuft");
+    setRobot(e.start);
+    let i = 0;
+    timer.current = setInterval(() => {
+      i++;
+      if (i < pfad.length) { setRobot(pfad[i]); return; }
+      if (timer.current) clearInterval(timer.current);
+      const end = pfad[pfad.length - 1];
+      if (!problem && end.x === e.ziel.x && end.y === e.ziel.y) {
+        setStatus("erfolg");
+      } else {
+        setFehler((f) => f + 1);
+        setMeldung(
+          problem === "raus" ? "Der Roboter ist aus dem Feld gelaufen. Pass die Befehle an."
+          : problem === "wand" ? "Der Roboter ist gegen die Wand gelaufen. Plan einen Umweg."
+          : "Der Roboter steht noch nicht auf der Kiste. Probier es nochmal."
+        );
+        setStatus("fehler");
+      }
+    }, 380);
+  }
+
+  return (
+    <Card className="p-8 sm:p-10">
+      <Kicker text={kicker} />
+      <p className="mt-3 rounded-2xl bg-black/5 px-4 py-3 font-medium">{e.intro}</p>
+      <h2 className="mt-3 text-2xl font-bold leading-snug">{e.frage}</h2>
+
+      {/* Spielfeld */}
+      <div className="mt-5 flex justify-center">
+        <div className="grid w-max gap-1.5" style={{ gridTemplateColumns: `repeat(${e.breite}, 3rem)` }}>
+          {Array.from({ length: e.hoehe }).map((_, y) =>
+            Array.from({ length: e.breite }).map((_, x) => {
+              const isRobot = robot.x === x && robot.y === y;
+              const isZiel = e.ziel.x === x && e.ziel.y === y;
+              const wand = istWand(x, y);
+              return (
+                <div key={`${x}-${y}`}
+                  className={"grid h-12 w-12 place-items-center rounded-lg text-2xl transition " +
+                    (wand ? "bg-ink/80" : isRobot && isZiel && status === "erfolg" ? "border-2 border-green bg-green-soft"
+                      : "border border-line bg-black/5")}>
+                  {isRobot ? "🤖" : isZiel ? "📦" : ""}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Befehls-Palette */}
+      <div className="mt-6 grid grid-cols-4 gap-2.5">
+        {BEFEHLE.map((b) => (
+          <button key={b.d} onClick={() => add(b.d)} disabled={laeuft || status === "erfolg"}
+            className="flex flex-col items-center gap-1 rounded-2xl border border-line bg-white py-3 text-2xl transition hover:border-green hover:bg-green-soft/40 disabled:opacity-40">
+            <span>{b.icon}</span><span className="text-xs font-semibold text-ink-soft">{b.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Programm */}
+      <div className="mt-4 min-h-[3rem] rounded-2xl border border-dashed border-line bg-black/5 p-3">
+        {prog.length === 0
+          ? <p className="text-center text-sm text-ink-soft">Tippe oben auf die Pfeile, um die Befehle aneinanderzureihen.</p>
+          : <div className="flex flex-wrap items-center gap-1.5">
+              {prog.map((d, i) => (
+                <span key={i} className="grid h-9 w-9 place-items-center rounded-lg border border-line bg-white text-xl">{ICON[d]}</span>
+              ))}
+            </div>}
+      </div>
+
+      {status === "fehler" && <p className="mt-4 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-amber">{meldung}</p>}
+      {status === "erfolg" && <p className="mt-4 rounded-2xl bg-green-soft px-4 py-3 text-sm leading-relaxed text-green-dark">✅ {e.erklaerung}</p>}
+      {status !== "erfolg" && <Hilfe text={e.tipp ?? "Bau die Befehle Schritt für Schritt und starte den Roboter – siehst du, wo er landet, kannst du nachbessern."} offen={tipp} onOeffnen={() => setTipp(true)} />}
+
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <div className="flex gap-2">
+          <button onClick={undo} disabled={laeuft || status === "erfolg" || prog.length === 0}
+            className="rounded-full border border-line px-3 py-2 text-sm font-medium text-ink-soft transition hover:border-green hover:text-green disabled:opacity-30">↶ Zurück</button>
+          <button onClick={leeren} disabled={laeuft || status === "erfolg" || prog.length === 0}
+            className="rounded-full border border-line px-3 py-2 text-sm font-medium text-ink-soft transition hover:border-green hover:text-green disabled:opacity-30">Leeren</button>
+        </div>
+        {status === "erfolg"
+          ? <Button onClick={() => onNext({ selbststaendig: fehler === 0 && !tipp, tipp })}>Weiter →</Button>
+          : <Button onClick={starten} disabled={laeuft || prog.length === 0}>▶ Roboter starten</Button>}
       </div>
     </Card>
   );
