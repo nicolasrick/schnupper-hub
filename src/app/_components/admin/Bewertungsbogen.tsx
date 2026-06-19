@@ -137,7 +137,7 @@ export function Bewertungsbogen({
               <input
                 value={bewertung.datumBis}
                 onChange={(e) => onChange({ datumBis: e.target.value })}
-                placeholder={formatDatum(t.datum) || "z. B. 18.–19.06.2026"}
+                placeholder={formatDatum(t.datum) || "z. B. 19.06.2026"}
                 className="min-w-0 flex-1 border-b border-line/60 bg-transparent text-[12.5px] font-semibold leading-snug outline-none placeholder:font-normal placeholder:text-ink-soft/60 focus:border-sg-green"
               />
             </div>

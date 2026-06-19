@@ -376,7 +376,7 @@ export default function AdminPage() {
                     <button onClick={() => setModal("bestaetigung")} className="rounded-full bg-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-dark">📄 Bestätigung</button>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-ink-soft">💾 Lokal auf diesem Gerät gespeichert. Bericht/Bestätigung per Drucken → «Als PDF speichern» ablegen.</p>
+                <p className="mt-3 text-xs text-ink-soft">💾 Auf dem Server gespeichert – du &amp; Gioele teilen denselben Stand. Bericht/Bestätigung per Drucken → «Als PDF speichern» ablegen.</p>
               </>
             )}
           </div>
