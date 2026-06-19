@@ -62,7 +62,7 @@ export const STATIONEN: Station[] = [
 
 export const ORGANISATION = {
   name: "Informatikdienste der Stadt St. Gallen (IDS)",
-  beruf: "Informatiker/in EFZ – Plattformentwicklung",
+  beruf: "Informatiker/in Plattformentwicklung EFZ",
   ort: "St. Gallen",
   kontaktMail: "nicolas.rick@stadt.sg.ch",
 };
@@ -326,4 +326,50 @@ export function standardArbeiten(): string {
     "Hardware-Komponenten für einen Gaming-PC zusammenstellen, programmieren mit Scratch und " +
     "Aufgaben mit PowerShell durchführen."
   );
+}
+
+// --- Auto-«Beurteilung in Worten» aus den angekreuzten Bewertungen -----------
+const SKALA_PHRASE: Record<string, string> = {
+  schnell: "erfasste theoretische Aufgaben schnell", gut: "erfasste theoretische Aufgaben gut",
+  folgt: "konnte den theoretischen Aufgaben folgen", muehe: "hatte mit theoretischen Aufgaben noch Mühe",
+  geschickt: "packte praktische Arbeiten geschickt an", zweckmaessig: "ging praktische Arbeiten zweckmässig an",
+  umstaendlich: "löste praktische Arbeiten noch umständlich", planlos: "ging praktische Arbeiten eher planlos an",
+};
+const AUSF_PHRASE: Record<string, string> = {
+  sehr_genau: "sehr genau", sorgfaeltig: "sorgfältig", ordentlich: "ordentlich", fluechtig: "eher flüchtig",
+  sehr_rasch: "sehr rasch", zuegig: "zügig", angemessen: "in angemessenem Tempo", langsam: "eher langsam",
+  unermuedlich: "unermüdlich", beharrlich: "beharrlich", konstant: "mit konstanter Ausdauer", gibt_auf: "wenig ausdauernd",
+  sehr_hoch: "hoch konzentriert", gut_dabei: "konzentriert bei der Sache", maessig: "mit wechselnder Konzentration", unkonzentriert: "eher unkonzentriert",
+};
+const EIGNUNG_WORT: Record<string, string> = {
+  interesse: "Motivation", auftreten: "Auftreten", kontakt: "Kontaktfreude", team: "Teamfähigkeit",
+  puenktlich: "Zuverlässigkeit", selbstaendig: "Selbständigkeit", praktisch: "praktischer Eignung", intellektuell: "schulischer Eignung",
+};
+function joinUnd(a: string[]): string {
+  return a.length <= 1 ? (a[0] || "") : a.slice(0, -1).join(", ") + " und " + a[a.length - 1];
+}
+
+/** Setzt aus den angekreuzten Skalen + der Eignungs-Matrix einen Fliesstext zusammen
+ *  (Textbausteine, geschlechts-korrekt). Wird im Bewertungsbogen als Vorschlag gezeigt. */
+export function generiereBegruendung(t: Teilnehmer, b: Bewertung): string {
+  const name = t.vorname || "Die teilnehmende Person";
+  const g: G = t.geschlecht || "d";
+  const low = g === "m" ? "er" : g === "w" ? "sie" : name;
+  const out: string[] = [];
+  const subj = () => (out.length === 0 ? name : low);
+
+  const tp = ["theorie", "praxis"].map((k) => b.skala[k]).filter(Boolean).map((v) => SKALA_PHRASE[v]).filter(Boolean);
+  if (tp.length) out.push(`${name} ${joinUnd(tp)}.`);
+
+  const cd = ["genauigkeit", "tempo", "ausdauer", "konzentration"].map((k) => b.skala[k]).filter(Boolean).map((v) => AUSF_PHRASE[v]).filter(Boolean);
+  if (cd.length) out.push(`Die Arbeiten erledigte ${subj()} ${joinUnd(cd)}.`);
+
+  const grp: Record<string, string[]> = { "Sehr gut": [], "Gut": [], "Genügend": [], "Ungenügend": [] };
+  EIGNUNG_KRITERIEN.forEach((k) => { const s = b.eignung[k.id]; if (s && grp[s]) grp[s].push(EIGNUNG_WORT[k.id] || k.label); });
+  if (grp["Sehr gut"].length) out.push(`Besonders überzeugte ${subj()} bei ${joinUnd(grp["Sehr gut"])}.`);
+  if (grp["Gut"].length) out.push(`Gute Leistungen zeigte ${subj()} bei ${joinUnd(grp["Gut"])}.`);
+  if (grp["Genügend"].length) out.push(`Solide, mit Luft nach oben, war ${subj()} bei ${joinUnd(grp["Genügend"])}.`);
+  if (grp["Ungenügend"].length) out.push(`Entwicklungspotenzial besteht bei ${joinUnd(grp["Ungenügend"])}.`);
+
+  return out.join(" ");
 }

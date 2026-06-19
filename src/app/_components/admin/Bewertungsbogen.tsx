@@ -2,7 +2,7 @@
 
 import {
   Teilnehmer, Bewertung, ORGANISATION, formatDatum,
-  SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN,
+  SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN, generiereBegruendung,
 } from "@/lib/admin";
 
 export function Bewertungsbogen({
@@ -13,11 +13,16 @@ export function Bewertungsbogen({
   onChange: (patch: Partial<Bewertung>) => void;
   onClose: () => void;
 }) {
-  const setSkala = (key: string, v: string) => onChange({ skala: { ...bewertung.skala, [key]: v } });
-  const setEignung = (id: string, v: string) => onChange({ eignung: { ...bewertung.eignung, [id]: v } });
+  // Klick auf bereits Gewähltes hebt die Auswahl wieder auf.
+  const setSkala = (key: string, v: string) =>
+    onChange({ skala: { ...bewertung.skala, [key]: bewertung.skala[key] === v ? "" : v } });
+  const setEignung = (id: string, v: string) =>
+    onChange({ eignung: { ...bewertung.eignung, [id]: bewertung.eignung[id] === v ? "" : v } });
 
   const kopf = SKALA_FRAGEN.filter((f) => f.gruppe === "kopf");
   const ausfuehrung = SKALA_FRAGEN.filter((f) => f.gruppe === "ausfuehrung");
+  const autoText = generiereBegruendung(t, bewertung);
+  const jugend = `${t.nachname}${t.nachname && t.vorname ? ", " : ""}${t.vorname}`.trim();
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-auto bg-black/70 p-4 sm:p-8">
@@ -27,188 +32,176 @@ export function Bewertungsbogen({
           ← Schliessen
         </button>
         <button onClick={() => window.print()} className="rounded-full bg-sg-green px-5 py-2 text-sm font-semibold text-white hover:brightness-90">
-          🖨 Drucken / Als PDF speichern
+          🖨 Drucken / Als PDF
         </button>
       </div>
 
       {/* A4-Dokument */}
-      <div className="print-doc mx-auto w-full max-w-[210mm] bg-white p-[16mm] text-[13px] leading-snug text-ink shadow-2xl">
+      <div className="print-doc mx-auto w-full max-w-[210mm] bg-white px-[16mm] py-[14mm] text-[13px] leading-snug text-ink shadow-2xl">
         {/* Kopf */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-end justify-between border-b-[3px] border-sg-green pb-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/ids-logo.svg" alt="Informatikdienste Stadt St. Gallen" className="h-11 w-auto" />
-          <p className="text-right text-xs text-ink-soft">Auswertung Schnupperlehre · Vorlage 2023</p>
-        </div>
-        <div className="mt-2 h-1 w-full rounded" style={{ background: "var(--sg-green)" }} />
-
-        <h1 className="mt-5 text-xl font-bold">Auswertung der Schnupperlehre durch den Betrieb</h1>
-        <p className="mt-1 text-xs italic text-ink-soft">Beobachten – Beurteilen – Besprechen</p>
-
-        {/* Betrieb + Jugendliche/r (vorausgefüllt) */}
-        <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-1 rounded-lg bg-black/[0.03] p-4">
-          <Info label="Betrieb" value={ORGANISATION.name} />
-          <Info label="Verantwortlich" value={t.betreuer || "Nicolas Rick / Gioele Parenti"} />
-          <Info label="Adresse" value="Poststrasse 28, 9000 St. Gallen" />
-          <Info label="Beruf" value={ORGANISATION.beruf} />
-          <Info label="Jugendliche/r" value={`${t.nachname} ${t.vorname}`.trim() || "—"} />
-          <div className="flex flex-wrap items-baseline gap-1">
-            <span className="text-xs font-semibold text-ink-soft">Geschnuppert:</span>
-            <span className="text-sm">{formatDatum(t.datum) || "—"} bis</span>
-            <input
-              value={bewertung.datumBis}
-              onChange={(e) => onChange({ datumBis: e.target.value })}
-              placeholder="Datum"
-              className="w-28 border-b border-line bg-transparent text-sm outline-none focus:border-sg-green"
-            />
+          <img src="/ids-logo.svg" alt="Informatikdienste Stadt St. Gallen" className="h-[58px] w-auto" />
+          <div className="text-right">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sg-green">Beobachten · Beurteilen · Besprechen</p>
+            <h1 className="mt-0.5 text-[23px] font-extrabold leading-tight tracking-tight">Auswertung der Schnupperlehre</h1>
+            <p className="text-[11px] text-ink-soft">Informatiker/in Plattformentwicklung EFZ · durch den Betrieb</p>
           </div>
         </div>
 
+        {/* Betrieb / Jugendliche */}
+        <div className="mt-4 grid grid-cols-2 gap-x-6">
+          <div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Betrieb</p>
+            <Row label="Name" value={ORGANISATION.name} />
+            <Row label="Adresse" value="Poststrasse 28 · 9000 St. Gallen" />
+            <Row label="Verantwortlich" value={t.betreuer || "Nicolas Rick / Gioele Parenti"} />
+          </div>
+          <div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Jugendliche/r</p>
+            <Row label="Name, Vorname" value={jugend || "—"} />
+            <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
+              <span className="w-[92px] shrink-0 text-[10.5px] font-medium text-ink-soft">Schnuppertag(e)</span>
+              <span className="flex-1 text-[13px] font-semibold leading-snug">
+                {formatDatum(t.datum) || "—"}
+                <input
+                  value={bewertung.datumBis}
+                  onChange={(e) => onChange({ datumBis: e.target.value })}
+                  placeholder="bis (optional)"
+                  className="ml-2 w-28 border-b border-line bg-transparent text-[12px] font-normal outline-none focus:border-sg-green"
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+        <Row label="Beruf" value={ORGANISATION.beruf} className="mt-0.5" />
+
         {/* Durchgeführte Arbeiten */}
-        <Section title="Folgende Arbeiten hat die/der Jugendliche durchgeführt">
-          <textarea
-            value={bewertung.arbeiten}
-            onChange={(e) => onChange({ arbeiten: e.target.value })}
-            rows={3}
-            className="w-full resize-none rounded border border-line bg-transparent p-2 text-[13px] outline-none focus:border-sg-green"
-          />
-        </Section>
+        <Sech>Folgende Arbeiten hat die/der Jugendliche durchgeführt</Sech>
+        <textarea
+          value={bewertung.arbeiten}
+          onChange={(e) => onChange({ arbeiten: e.target.value })}
+          rows={3}
+          className="w-full resize-none rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none focus:border-sg-green"
+        />
 
         {/* Theorie / Praxis */}
-        <div className="mt-5 grid grid-cols-2 gap-8">
+        <Sech>Wie wurden die Aufgaben angegangen?</Sech>
+        <div className="grid grid-cols-2 gap-3 break-inside-avoid">
           {kopf.map((f) => (
-            <div key={f.key}>
-              <p className="mb-2 text-xs font-semibold">{f.frage}</p>
-              <div className="space-y-1">
-                {f.optionen.map((o) => (
-                  <RadioRow
-                    key={o.v} name={f.key} label={o.l}
-                    checked={bewertung.skala[f.key] === o.v}
-                    onChange={() => setSkala(f.key, o.v)}
-                  />
-                ))}
-              </div>
+            <div key={f.key} className="rounded-lg border border-line/70 bg-black/[0.015] p-3">
+              <p className="mb-1.5 text-[11px] font-bold text-ink-soft">{f.frage.replace("Wie wurden ", "").replace("?", "")}</p>
+              {f.optionen.map((o) => (
+                <Opt key={o.v} on={bewertung.skala[f.key] === o.v} label={o.l} onClick={() => setSkala(f.key, o.v)} />
+              ))}
             </div>
           ))}
         </div>
 
         {/* Wie ausgeführt – 4 Spalten */}
-        <Section title="Wie wurden die Arbeiten ausgeführt?">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4">
-            {ausfuehrung.map((f) => (
-              <div key={f.key}>
-                <p className="mb-2 text-xs font-semibold">{f.frage}</p>
-                <div className="space-y-1">
-                  {f.optionen.map((o) => (
-                    <RadioRow
-                      key={o.v} name={f.key} label={o.l}
-                      checked={bewertung.skala[f.key] === o.v}
-                      onChange={() => setSkala(f.key, o.v)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
+        <Sech>Wie wurden die Arbeiten ausgeführt?</Sech>
+        <div className="grid grid-cols-4 gap-3 break-inside-avoid">
+          {ausfuehrung.map((f) => (
+            <div key={f.key} className="rounded-lg border border-line/70 bg-black/[0.015] p-3">
+              <p className="mb-1.5 text-[11px] font-bold text-ink-soft">{f.frage}</p>
+              {f.optionen.map((o) => (
+                <Opt key={o.v} on={bewertung.skala[f.key] === o.v} label={o.l} onClick={() => setSkala(f.key, o.v)} />
+              ))}
+            </div>
+          ))}
+        </div>
 
         {/* Verhalten und Eignung – Matrix */}
-        <Section title="Verhalten und Eignung">
-          <table className="w-full border-collapse text-[12px]">
-            <thead>
-              <tr>
-                <th className="w-1/3" />
-                {EIGNUNG_STUFEN.map((s) => (
-                  <th key={s} className="px-1 pb-1 text-center align-bottom font-semibold text-ink-soft">{s}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {EIGNUNG_KRITERIEN.map((k) => (
-                <tr key={k.id} className="border-t border-line">
-                  <td className="py-1.5 pr-2">{k.label}</td>
-                  {EIGNUNG_STUFEN.map((s) => (
-                    <td key={s} className="text-center">
-                      <input
-                        type="radio" name={`eig-${k.id}`}
-                        checked={bewertung.eignung[k.id] === s}
-                        onChange={() => setEignung(k.id, s)}
-                        className="h-3.5 w-3.5 accent-[var(--sg-green)]"
-                      />
-                    </td>
-                  ))}
-                </tr>
+        <Sech>Verhalten und Eignung</Sech>
+        <table className="w-full border-collapse break-inside-avoid text-[11.5px]">
+          <thead>
+            <tr>
+              <th className="w-[36%]" />
+              {EIGNUNG_STUFEN.map((s) => (
+                <th key={s} className="px-1 pb-1.5 text-center align-bottom text-[9px] font-bold text-ink-soft">{s}</th>
               ))}
-            </tbody>
-          </table>
-        </Section>
+            </tr>
+          </thead>
+          <tbody>
+            {EIGNUNG_KRITERIEN.map((k, i) => (
+              <tr key={k.id} className={i % 2 ? "bg-black/[0.025]" : ""}>
+                <td className="rounded-l-md border-t border-line py-1.5 pl-2 pr-2 font-medium">{k.label}</td>
+                {EIGNUNG_STUFEN.map((s, j) => {
+                  const on = bewertung.eignung[k.id] === s;
+                  return (
+                    <td key={s} className={"border-t border-line text-center " + (j === EIGNUNG_STUFEN.length - 1 ? "rounded-r-md" : "")}>
+                      <button onClick={() => setEignung(k.id, s)} className="grid w-full place-items-center py-1">
+                        <span className={"grid h-4 w-4 place-items-center rounded border text-[10px] leading-none text-white " + (on ? "border-sg-green bg-sg-green" : "border-ink-soft/40")}>{on ? "✓" : ""}</span>
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-        {/* Begründung */}
-        <Section title="Kurze Begründung">
+        {/* Kurze Begründung (auto-Vorschlag aus den Bewertungen) */}
+        <div className="break-inside-avoid">
+          <div className="mb-2 mt-4 flex items-center justify-between border-b border-line/70 pb-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Kurze Begründung</p>
+            {autoText && (
+              <button
+                onClick={() => onChange({ begruendung: autoText })}
+                className="no-print rounded-full bg-sg-green/10 px-2.5 py-1 text-[11px] font-semibold text-sg-green hover:bg-sg-green/20"
+              >
+                ✨ Vorschlag übernehmen
+              </button>
+            )}
+          </div>
           <textarea
             value={bewertung.begruendung}
             onChange={(e) => onChange({ begruendung: e.target.value })}
             rows={3}
-            className="w-full resize-none rounded border border-line bg-transparent p-2 text-[13px] outline-none focus:border-sg-green"
+            placeholder={autoText || "Begründung in eigenen Worten …"}
+            className="w-full resize-none rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none placeholder:text-ink-soft/60 focus:border-sg-green"
           />
-        </Section>
+        </div>
 
         {/* Besprochen + Unterschrift */}
-        <div className="mt-5 flex items-center gap-4 text-xs">
-          <span className="font-semibold">Beurteilung mit dem/der Jugendlichen besprochen?</span>
+        <div className="mt-4 flex flex-wrap items-center gap-4 break-inside-avoid text-[12px]">
+          <span className="font-semibold">Beurteilung mit der/dem Jugendlichen besprochen?</span>
           {(["ja", "nein"] as const).map((opt) => (
-            <RadioRow
-              key={opt} name="besprochen" label={opt === "ja" ? "ja" : "nein"}
-              checked={bewertung.besprochen === opt}
-              onChange={() => onChange({ besprochen: opt })}
-              inline
-            />
+            <Opt key={opt} inline on={bewertung.besprochen === opt} label={opt} onClick={() => onChange({ besprochen: bewertung.besprochen === opt ? "" : opt })} />
           ))}
         </div>
 
-        <div className="mt-12 flex items-end justify-between text-xs">
-          <div>
-            <span>Datum: {formatDatum(bewertung.datumBis) || formatDatum(t.datum) || "__________"}</span>
-          </div>
-          <div className="text-center">
-            <div className="h-px w-56 bg-ink/40" />
-            <p className="mt-1">Unterschrift verantwortliche Person</p>
-          </div>
+        <div className="mt-10 grid grid-cols-2 gap-10 break-inside-avoid">
+          <div className="border-t border-ink/40 pt-1 text-[11px] text-ink-soft">Ort / Datum</div>
+          <div className="border-t border-ink/40 pt-1 text-[11px] text-ink-soft">Unterschrift{t.betreuer ? " — " + t.betreuer : " verantwortliche Person"}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Row({ label, value, className = "" }: { label: string; value: string; className?: string }) {
   return (
-    <div className="flex flex-wrap items-baseline gap-1">
-      <span className="text-xs font-semibold text-ink-soft">{label}:</span>
-      <span className="text-sm">{value}</span>
+    <div className={"flex items-baseline gap-2 border-b border-line/70 py-1 " + className}>
+      <span className="w-[92px] shrink-0 text-[10.5px] font-medium text-ink-soft">{label}</span>
+      <span className="flex-1 break-words text-[13px] font-semibold leading-snug">{value}</span>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Sech({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-5">
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--sg-green)" }}>{title}</p>
+    <p className="mb-2 mt-4 break-after-avoid border-b border-line/70 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">
       {children}
-    </div>
+    </p>
   );
 }
 
-function RadioRow({
-  name, label, checked, onChange, inline,
-}: {
-  name: string; label: string; checked: boolean; onChange: () => void; inline?: boolean;
-}) {
+function Opt({ on, label, onClick, inline }: { on: boolean; label: string; onClick: () => void; inline?: boolean }) {
   return (
-    <label className={"flex cursor-pointer items-center gap-2 " + (inline ? "" : "text-[13px]")}>
-      <input
-        type="radio" name={name} checked={checked} onChange={onChange}
-        className="h-3.5 w-3.5 accent-[var(--sg-green)]"
-      />
-      <span>{label}</span>
-    </label>
+    <button onClick={onClick} className={"flex items-center gap-2 text-left " + (inline ? "" : "w-full py-[3px]")}>
+      <span className={"grid h-[14px] w-[14px] shrink-0 place-items-center rounded-[3px] border text-[9px] leading-none text-white " + (on ? "border-sg-green bg-sg-green" : "border-ink-soft/45")}>{on ? "✓" : ""}</span>
+      <span className={"text-[12px] " + (on ? "font-semibold text-ink" : "text-ink/75")}>{label}</span>
+    </button>
   );
 }
