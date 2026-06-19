@@ -54,9 +54,14 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/api/export") && !authed) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // KI-Umformulieren nur eingeloggt (schützt den API-Key vor Missbrauch).
+  if (pathname.startsWith("/api/umformulieren") && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren"],
 };

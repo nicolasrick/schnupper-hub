@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Teilnehmer, Bewertung, ORGANISATION, formatDatum,
   SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN, generiereBegruendung,
@@ -42,6 +42,33 @@ export function Bewertungsbogen({
     onChange({ skala: { ...SCHNELL_SKALA }, eignung: Object.fromEntries(EIGNUNG_KRITERIEN.map((k) => [k.id, "Gut"])) });
   const leeren = () => onChange({ skala: {}, eignung: {}, begruendung: "", besprochen: "" });
 
+  // KI: macht die Begründung flüssiger und variiert sie (braucht ANTHROPIC_API_KEY auf dem Server).
+  const [kiBusy, setKiBusy] = useState(false);
+  const [kiFehler, setKiFehler] = useState("");
+  async function kiUmformulieren() {
+    const quelle = begruendungAnzeige.trim();
+    if (!quelle || kiBusy) return;
+    setKiBusy(true);
+    setKiFehler("");
+    try {
+      const res = await fetch("/api/umformulieren", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: quelle, name: t.vorname || "" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setKiFehler(data?.message || "KI-Umformulieren fehlgeschlagen.");
+        return;
+      }
+      if (data?.text) onChange({ begruendung: data.text });
+    } catch {
+      setKiFehler("Netzwerkfehler – bitte erneut versuchen.");
+    } finally {
+      setKiBusy(false);
+    }
+  }
+
   return (
     <div className="bw-modal fixed inset-0 z-50 flex flex-col overflow-auto bg-black/70 p-4 sm:p-8">
       <style>{`
@@ -80,7 +107,19 @@ export function Bewertungsbogen({
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Betrieb</p>
             <Row label="Name" value="Informatikdienste Stadt St. Gallen" />
             <Row label="Adresse" value="Poststrasse 28 · 9000 St. Gallen" />
-            <Row label="Verantwortlich" value={t.betreuer || "Nicolas Rick / Gioele Parenti"} />
+            <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
+              <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Verantwortlich</span>
+              <select
+                value={t.betreuer || ""}
+                onChange={(e) => onChangeT({ betreuer: e.target.value })}
+                className="min-w-0 flex-1 cursor-pointer bg-transparent text-[12.5px] font-semibold leading-snug outline-none focus:text-sg-green"
+              >
+                <option value="">— wählen —</option>
+                <option value="Nicolas Rick">Nicolas Rick</option>
+                <option value="Gioele Parenti">Gioele Parenti</option>
+                <option value="Nicolas Rick / Gioele Parenti">Nicolas Rick / Gioele Parenti</option>
+              </select>
+            </div>
           </div>
           <div>
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Jugendliche/r</p>
@@ -190,6 +229,17 @@ export function Bewertungsbogen({
                 + {b.label}
               </button>
             ))}
+          </div>
+          <div className="no-print mt-2 flex flex-wrap items-center gap-2">
+            <button
+              onClick={kiUmformulieren}
+              disabled={kiBusy || !begruendungAnzeige.trim()}
+              className="rounded-full bg-sg-green px-3 py-1.5 text-[11px] font-semibold text-white transition hover:brightness-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {kiBusy ? "✨ formuliert …" : "✨ KI: flüssiger formulieren"}
+            </button>
+            <span className="text-[10px] text-ink-soft/80">macht den Text flüssiger und variiert ihn pro Jugendlichem</span>
+            {kiFehler && <span className="w-full text-[11px] font-medium text-sg-green">{kiFehler}</span>}
           </div>
         </div>
 

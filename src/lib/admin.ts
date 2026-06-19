@@ -114,6 +114,18 @@ export function formatDatum(iso: string): string {
   return d && m && y ? `${d}.${m}.${y}` : iso;
 }
 
+/** Standard-Schnuppertage: gestern – heute (2-tägige Schnupperlehre), z.B. «18.–19.06.2026». */
+export function schnuppertageRange(): string {
+  const heute = new Date();
+  const gestern = new Date(heute.getTime() - 86_400_000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  const sameMonth = gestern.getMonth() === heute.getMonth() && gestern.getFullYear() === heute.getFullYear();
+  if (sameMonth) {
+    return `${p(gestern.getDate())}.–${p(heute.getDate())}.${p(heute.getMonth() + 1)}.${heute.getFullYear()}`;
+  }
+  return `${p(gestern.getDate())}.${p(gestern.getMonth() + 1)}.${gestern.getFullYear()}–${p(heute.getDate())}.${p(heute.getMonth() + 1)}.${heute.getFullYear()}`;
+}
+
 // --- Mailvorlagen ------------------------------------------------------------
 
 export interface MailVorlage {

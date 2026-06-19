@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Teilnehmer, Bewertung, STATIONEN, ladeTeilnehmer, speichereTeilnehmer,
-  neuerTeilnehmer, vollerName, formatDatum, leereBewertung, standardArbeiten,
+  neuerTeilnehmer, vollerName, formatDatum, leereBewertung, standardArbeiten, schnuppertageRange,
 } from "@/lib/admin";
 import { MODI } from "@/lib/modi";
 import { api } from "@/lib/api";
@@ -131,11 +131,11 @@ export default function AdminPage() {
 
   function oeffneBewertung() {
     if (!selected) return;
-    if (!selected.bewertung) aktualisiere({ bewertung: { ...leereBewertung(), arbeiten: standardArbeiten() } });
+    if (!selected.bewertung) aktualisiere({ bewertung: { ...leereBewertung(), arbeiten: standardArbeiten(), datumBis: schnuppertageRange() } });
     setModal("bewertung");
   }
   function bewertungAusErgebnis(e: ErgebnisEintrag) {
-    const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, bewertung: { ...leereBewertung(), arbeiten: standardArbeiten() } };
+    const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, bewertung: { ...leereBewertung(), arbeiten: standardArbeiten(), datumBis: schnuppertageRange() } };
     persist([tn, ...liste]);
     setSelectedId(tn.id);
     setModal("bewertung");
