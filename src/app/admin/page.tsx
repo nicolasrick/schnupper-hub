@@ -349,7 +349,7 @@ export default function AdminPage() {
       {selected && modal === "bestaetigung" && <Bestaetigung t={selected} onClose={() => setModal("none")} />}
       {selected && modal === "mail" && <MailVorlagen t={selected} onClose={() => setModal("none")} />}
       {selected && modal === "bewertung" && (
-        <Bewertungsbogen t={selected} bewertung={selected.bewertung ?? leereBewertung()} onChange={aktualisiereBewertung} onClose={() => setModal("none")} />
+        <Bewertungsbogen t={selected} bewertung={selected.bewertung ?? leereBewertung()} onChange={aktualisiereBewertung} onChangeT={aktualisiere} onClose={() => setModal("none")} />
       )}
       {selected && modal === "bericht" && (
         <Schnupperbericht t={selected} onChange={aktualisiere} onClose={() => setModal("none")} />

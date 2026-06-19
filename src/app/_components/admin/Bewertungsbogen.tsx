@@ -14,11 +14,12 @@ const SCHNELL_SKALA: Record<string, string> = {
 };
 
 export function Bewertungsbogen({
-  t, bewertung, onChange, onClose,
+  t, bewertung, onChange, onChangeT, onClose,
 }: {
   t: Teilnehmer;
   bewertung: Bewertung;
   onChange: (patch: Partial<Bewertung>) => void;
+  onChangeT: (patch: Partial<Teilnehmer>) => void;
   onClose: () => void;
 }) {
   const setSkala = (key: string, v: string) =>
@@ -29,7 +30,6 @@ export function Bewertungsbogen({
   const kopf = SKALA_FRAGEN.filter((f) => f.gruppe === "kopf");
   const ausfuehrung = SKALA_FRAGEN.filter((f) => f.gruppe === "ausfuehrung");
   const autoText = generiereBegruendung(t, bewertung);
-  const jugend = `${t.nachname}${t.nachname && t.vorname ? ", " : ""}${t.vorname}`.trim();
   // Begründung erscheint LIVE aus den Ankreuzungen; sobald getippt wird, gilt der eigene Text.
   const begruendungAnzeige = bewertung.begruendung || autoText;
 
@@ -89,7 +89,15 @@ export function Bewertungsbogen({
           </div>
           <div>
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Jugendliche/r</p>
-            <Row label="Name, Vorname" value={jugend || "—"} />
+            <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
+              <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Name, Vorname</span>
+              <span className="flex flex-1 items-baseline gap-1.5 text-[12.5px] font-semibold leading-snug">
+                <input value={t.nachname} onChange={(e) => onChangeT({ nachname: e.target.value })} placeholder="Name"
+                  className="min-w-0 flex-1 border-b border-line/60 bg-transparent outline-none placeholder:font-normal placeholder:text-ink-soft/50 focus:border-sg-green" />
+                <input value={t.vorname} onChange={(e) => onChangeT({ vorname: e.target.value })} placeholder="Vorname"
+                  className="min-w-0 flex-1 border-b border-line/60 bg-transparent outline-none placeholder:font-normal placeholder:text-ink-soft/50 focus:border-sg-green" />
+              </span>
+            </div>
             <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
               <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Schnuppertag(e)</span>
               <span className="flex-1 text-[12.5px] font-semibold leading-snug">
