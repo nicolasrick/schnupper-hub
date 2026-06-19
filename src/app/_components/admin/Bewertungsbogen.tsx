@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import {
   Teilnehmer, Bewertung, ORGANISATION, formatDatum,
   SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN, generiereBegruendung,
+  BEOBACHTUNGEN,
 } from "@/lib/admin";
 
 export function Bewertungsbogen({
@@ -13,7 +15,6 @@ export function Bewertungsbogen({
   onChange: (patch: Partial<Bewertung>) => void;
   onClose: () => void;
 }) {
-  // Klick auf bereits Gewähltes hebt die Auswahl wieder auf.
   const setSkala = (key: string, v: string) =>
     onChange({ skala: { ...bewertung.skala, [key]: bewertung.skala[key] === v ? "" : v } });
   const setEignung = (id: string, v: string) =>
@@ -24,8 +25,22 @@ export function Bewertungsbogen({
   const autoText = generiereBegruendung(t, bewertung);
   const jugend = `${t.nachname}${t.nachname && t.vorname ? ", " : ""}${t.vorname}`.trim();
 
+  // Textbausteine (personalisierte Highlight-Sätze) an die Begründung anfügen
+  const name = t.vorname || "Die teilnehmende Person";
+  const g = t.geschlecht || "d";
+  const addBaustein = (satz: string) =>
+    onChange({ begruendung: (bewertung.begruendung.trim() ? bewertung.begruendung.trim() + " " : "") + satz });
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-auto bg-black/70 p-4 sm:p-8">
+    <div className="bw-modal fixed inset-0 z-50 flex flex-col overflow-auto bg-black/70 p-4 sm:p-8">
+      {/* Druck-Override: mehrseitig sauber (nicht das einseitige absolute-Layout) */}
+      <style>{`
+        @media print {
+          .bw-modal { position: absolute !important; top: 0 !important; left: 0 !important; right: auto !important; bottom: auto !important; width: 100% !important; height: auto !important; overflow: visible !important; background: transparent !important; padding: 0 !important; display: block !important; }
+          .bw-doc { position: static !important; inset: auto !important; box-shadow: none !important; margin: 0 auto !important; max-width: 210mm !important; }
+        }
+      `}</style>
+
       {/* Werkzeugleiste */}
       <div className="no-print mx-auto mb-4 flex w-full max-w-[210mm] items-center justify-between">
         <button onClick={onClose} className="rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white hover:bg-white/25">
@@ -37,7 +52,7 @@ export function Bewertungsbogen({
       </div>
 
       {/* A4-Dokument */}
-      <div className="print-doc mx-auto w-full max-w-[210mm] bg-white px-[16mm] py-[14mm] text-[13px] leading-snug text-ink shadow-2xl">
+      <div className="print-doc bw-doc mx-auto w-full max-w-[210mm] bg-white px-[16mm] py-[14mm] text-[13px] leading-snug text-ink shadow-2xl">
         {/* Kopf */}
         <div className="flex items-end justify-between border-b-[3px] border-sg-green pb-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,7 +68,7 @@ export function Bewertungsbogen({
         <div className="mt-4 grid grid-cols-2 gap-x-6">
           <div>
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Betrieb</p>
-            <Row label="Name" value={ORGANISATION.name} />
+            <Row label="Name" value="Informatikdienste Stadt St. Gallen" />
             <Row label="Adresse" value="Poststrasse 28 · 9000 St. Gallen" />
             <Row label="Verantwortlich" value={t.betreuer || "Nicolas Rick / Gioele Parenti"} />
           </div>
@@ -61,14 +76,14 @@ export function Bewertungsbogen({
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Jugendliche/r</p>
             <Row label="Name, Vorname" value={jugend || "—"} />
             <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
-              <span className="w-[92px] shrink-0 text-[10.5px] font-medium text-ink-soft">Schnuppertag(e)</span>
-              <span className="flex-1 text-[13px] font-semibold leading-snug">
+              <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Schnuppertag(e)</span>
+              <span className="flex-1 text-[12.5px] font-semibold leading-snug">
                 {formatDatum(t.datum) || "—"}
                 <input
                   value={bewertung.datumBis}
                   onChange={(e) => onChange({ datumBis: e.target.value })}
                   placeholder="bis (optional)"
-                  className="ml-2 w-28 border-b border-line bg-transparent text-[12px] font-normal outline-none focus:border-sg-green"
+                  className="ml-2 w-24 border-b border-line bg-transparent text-[12px] font-normal outline-none focus:border-sg-green"
                 />
               </span>
             </div>
@@ -78,11 +93,10 @@ export function Bewertungsbogen({
 
         {/* Durchgeführte Arbeiten */}
         <Sech>Folgende Arbeiten hat die/der Jugendliche durchgeführt</Sech>
-        <textarea
+        <AutoText
           value={bewertung.arbeiten}
-          onChange={(e) => onChange({ arbeiten: e.target.value })}
-          rows={3}
-          className="w-full resize-none rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none focus:border-sg-green"
+          onChange={(v) => onChange({ arbeiten: v })}
+          className="w-full resize-none overflow-hidden rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none focus:border-sg-green"
         />
 
         {/* Theorie / Praxis */}
@@ -141,9 +155,9 @@ export function Bewertungsbogen({
           </tbody>
         </table>
 
-        {/* Kurze Begründung (auto-Vorschlag aus den Bewertungen) */}
+        {/* Kurze Begründung */}
         <div className="break-inside-avoid">
-          <div className="mb-2 mt-4 flex items-center justify-between border-b border-line/70 pb-1">
+          <div className="mb-2 mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-line/70 pb-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Kurze Begründung</p>
             {autoText && (
               <button
@@ -154,13 +168,25 @@ export function Bewertungsbogen({
               </button>
             )}
           </div>
-          <textarea
+          <AutoText
             value={bewertung.begruendung}
-            onChange={(e) => onChange({ begruendung: e.target.value })}
-            rows={3}
-            placeholder={autoText || "Begründung in eigenen Worten …"}
-            className="w-full resize-none rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none placeholder:text-ink-soft/60 focus:border-sg-green"
+            onChange={(v) => onChange({ begruendung: v })}
+            placeholder={autoText || "Begründung in eigenen Worten – jederzeit frei anpassbar."}
+            className="min-h-[3.5rem] w-full resize-none overflow-hidden rounded-lg border border-line bg-transparent p-2 text-[12.5px] leading-relaxed outline-none placeholder:text-ink-soft/60 focus:border-sg-green"
           />
+          {/* Klick-Bausteine: persönliche Highlight-Sätze anfügen (für Abwechslung) */}
+          <div className="no-print mt-2 flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] text-ink-soft">Bausteine anfügen:</span>
+            {BEOBACHTUNGEN.map((b) => (
+              <button
+                key={b.id}
+                onClick={() => addBaustein(b.satz(name, g))}
+                className="rounded-full border border-line px-2.5 py-1 text-[11px] font-medium text-ink-soft transition hover:border-sg-green hover:text-sg-green"
+              >
+                + {b.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Besprochen + Unterschrift */}
@@ -180,11 +206,34 @@ export function Bewertungsbogen({
   );
 }
 
+/** Textarea, die automatisch auf ihren Inhalt wächst → im Druck nichts abgeschnitten. */
+function AutoText({ value, onChange, placeholder, className }: {
+  value: string; onChange: (v: string) => void; placeholder?: string; className?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      placeholder={placeholder}
+      rows={2}
+      onChange={(e) => onChange(e.target.value)}
+      className={className}
+    />
+  );
+}
+
 function Row({ label, value, className = "" }: { label: string; value: string; className?: string }) {
   return (
     <div className={"flex items-baseline gap-2 border-b border-line/70 py-1 " + className}>
-      <span className="w-[92px] shrink-0 text-[10.5px] font-medium text-ink-soft">{label}</span>
-      <span className="flex-1 break-words text-[13px] font-semibold leading-snug">{value}</span>
+      <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">{label}</span>
+      <span className="flex-1 break-words text-[12.5px] font-semibold leading-snug">{value}</span>
     </div>
   );
 }
