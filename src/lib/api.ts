@@ -24,4 +24,13 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(entry),
     }).catch(() => {}),
+
+  // Gemeinsame Teilnehmer-Liste (Admin) – geräteübergreifend auf dem Server.
+  ladeTeilnehmer: <T = unknown>() => j<T[]>("/api/teilnehmer"),
+  speichereTeilnehmer: (liste: unknown[]) =>
+    fetch("/api/teilnehmer", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(liste),
+    }),
 };

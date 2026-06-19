@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -61,22 +61,56 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    const l = pruneLocal(ladeTeilnehmer());
-    setListe(l);
-    speichereTeilnehmer(l);
-    if (l.length) setSelectedId(l[0].id);
+    // Server ist die gemeinsame Quelle (geräteübergreifend). localStorage nur Offline-Cache.
+    let aktiv = true;
+    (async () => {
+      const lokal = pruneLocal(ladeTeilnehmer());
+      try {
+        const serverListe = (await api.ladeTeilnehmer<Teilnehmer>()) as Teilnehmer[];
+        if (!aktiv) return;
+        if (serverListe.length === 0 && lokal.length > 0) {
+          // Einmaliger Umzug: bestehende lokale Daten auf den Server heben (kein Verlust).
+          setListe(lokal);
+          if (lokal.length) setSelectedId((cur) => cur ?? lokal[0].id);
+          api.speichereTeilnehmer(lokal).catch(() => {});
+        } else {
+          setListe(serverListe);
+          speichereTeilnehmer(serverListe); // Cache aktualisieren
+          if (serverListe.length) setSelectedId((cur) => cur ?? serverListe[0].id);
+        }
+      } catch {
+        // Offline/Fehler → lokalen Cache verwenden
+        if (!aktiv) return;
+        setListe(lokal);
+        if (lokal.length) setSelectedId((cur) => cur ?? lokal[0].id);
+      }
+    })();
     api.getModus().then(setModusState).catch(() => {});
     ladeAbgaben();
     ladeErgebnisse();
     const iv = setInterval(() => { ladeAbgaben(); ladeErgebnisse(); }, 15000); // live
-    return () => clearInterval(iv);
+    return () => { aktiv = false; clearInterval(iv); };
   }, []);
 
   const selected = liste.find((t) => t.id === selectedId) ?? null;
 
+  // Schreibt sofort in den lokalen Cache (snappy/offline) + debounced auf den Server (gemeinsam).
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   function persist(next: Teilnehmer[]) {
     setListe(next);
     speichereTeilnehmer(next);
+    if (syncTimer.current) clearTimeout(syncTimer.current);
+    syncTimer.current = setTimeout(() => { api.speichereTeilnehmer(next).catch(() => {}); }, 600);
+  }
+
+  // Manuell den Stand des anderen Geräts nachladen.
+  async function aktualisiereListe() {
+    try {
+      const serverListe = (await api.ladeTeilnehmer<Teilnehmer>()) as Teilnehmer[];
+      setListe(serverListe);
+      speichereTeilnehmer(serverListe);
+      setSelectedId((cur) => (cur && serverListe.some((t) => t.id === cur) ? cur : serverListe[0]?.id ?? null));
+    } catch { /* offline → lokalen Stand behalten */ }
   }
 
   async function waehleModus(id: string) {
@@ -114,7 +148,7 @@ export default function AdminPage() {
   }
 
   async function tagAbschliessen() {
-    if (!window.confirm("Erst exportieren – dann ALLE Daten löschen (lokale Teilnehmer auf diesem Gerät + alle Abgaben auf dem Server). Fortfahren?")) return;
+    if (!window.confirm("Erst exportieren – dann ALLE Daten löschen (gemeinsame Teilnehmer-Liste auf dem Server + alle Abgaben). Fortfahren?")) return;
     exportieren();
     persist([]);
     setSelectedId(null);
@@ -269,6 +303,9 @@ export default function AdminPage() {
         <div className="grid gap-5 md:grid-cols-[300px_1fr]">
           {/* Liste */}
           <div className="rounded-3xl bg-surface p-4 shadow-2xl ring-1 ring-black/5">
+            <div className="mb-2 flex justify-end">
+              <button onClick={aktualisiereListe} title="Stand vom Server / anderen Gerät laden" className="text-xs text-ink-soft hover:text-ink">↻ Aktualisieren</button>
+            </div>
             <button onClick={anlegen} className="w-full rounded-2xl bg-green px-4 py-3 text-sm font-semibold text-white hover:bg-green-dark">+ Neue:r Teilnehmer:in</button>
             <div className="mt-3 space-y-1.5">
               {liste.length === 0 && <p className="px-2 py-6 text-center text-sm text-ink-soft">Noch niemand erfasst.</p>}
