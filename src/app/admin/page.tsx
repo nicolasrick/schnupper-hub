@@ -134,6 +134,12 @@ export default function AdminPage() {
     if (!selected.bewertung) aktualisiere({ bewertung: { ...leereBewertung(), arbeiten: standardArbeiten() } });
     setModal("bewertung");
   }
+  function bewertungAusErgebnis(e: ErgebnisEintrag) {
+    const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, bewertung: { ...leereBewertung(), arbeiten: standardArbeiten() } };
+    persist([tn, ...liste]);
+    setSelectedId(tn.id);
+    setModal("bewertung");
+  }
   function aktualisiereBewertung(patch: Partial<Bewertung>) {
     if (!selected) return;
     aktualisiere({ bewertung: { ...(selected.bewertung ?? leereBewertung()), ...patch } });
@@ -213,6 +219,12 @@ export default function AdminPage() {
                   {e.starkeTeile.length > 0 && (
                     <p className="mt-1.5 text-xs text-ink-soft">Stark in: {e.starkeTeile.join(", ")}</p>
                   )}
+                  <button
+                    onClick={() => bewertungAusErgebnis(e)}
+                    className="mt-3 w-full rounded-full bg-green/10 px-3 py-1.5 text-xs font-semibold text-green-dark transition hover:bg-green/20"
+                  >
+                    → Bewertung anlegen
+                  </button>
                 </div>
               ))}
             </div>
