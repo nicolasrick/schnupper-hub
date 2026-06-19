@@ -2,8 +2,8 @@
 //  Eignungs-Check-Ergebnisse — bewusst MINIMIERT + KURZLEBIG.
 //
 //  Gespeichert wird nur, was der/die Berufsbildner:in fürs Gespräch braucht:
-//  Vorname + Kennzahlen des Checks (Passung, selbstständig gelöst, Tipps,
-//  starke Teile, Bonus). KEINE Einzelantworten, keine Kontaktdaten.
+//  Vor- + Nachname (für die Auswertung) + Kennzahlen des Checks (Passung,
+//  selbstständig gelöst, Tipps, starke Teile, Bonus). KEINE Einzelantworten.
 //  Auto-Prune nach PRUNE_STUNDEN; «Tag abschliessen» löscht alles.
 //  Liegt unter DATA_DIR/ergebnisse.json (Coolify-Volume mounten!).
 // =============================================================================
@@ -18,6 +18,7 @@ const PRUNE_STUNDEN = Number(process.env.ERGEBNIS_STUNDEN || 48);
 export interface ErgebnisEintrag {
   id: string;
   vorname: string;
+  nachname: string;
   ts: number;
   passung: number;
   selbststaendig: number;
@@ -44,6 +45,7 @@ export function sanitize(raw: Record<string, unknown>): ErgebnisEintrag {
   return {
     id: clampStr(raw.id, 40) || Math.random().toString(36).slice(2),
     vorname: clampStr(raw.vorname, 40) || "—",
+    nachname: clampStr(raw.nachname, 40),
     ts: Date.now(),
     passung: Math.max(0, Math.min(100, Math.round(num(raw.passung)))),
     selbststaendig: Math.max(0, Math.round(num(raw.selbststaendig))),

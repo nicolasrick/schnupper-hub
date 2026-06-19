@@ -135,7 +135,7 @@ export default function AdminPage() {
     setModal("bewertung");
   }
   function bewertungAusErgebnis(e: ErgebnisEintrag) {
-    const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, bewertung: { ...leereBewertung(), arbeiten: standardArbeiten(), datumBis: schnuppertageRange() } };
+    const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, nachname: e.nachname || "", bewertung: { ...leereBewertung(), arbeiten: standardArbeiten(), datumBis: schnuppertageRange() } };
     persist([tn, ...liste]);
     setSelectedId(tn.id);
     setModal("bewertung");

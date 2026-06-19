@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Card, Button, Brand } from "./ui";
 
-export function Start({ onStart, onBack }: { onStart: (name: string) => void; onBack?: () => void }) {
+export function Start({ onStart, onBack }: { onStart: (vorname: string, nachname: string) => void; onBack?: () => void }) {
   const [name, setName] = useState("");
+  const [nachname, setNachname] = useState("");
+  const bereit = name.trim().length >= 2 && nachname.trim().length >= 2;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (name.trim().length >= 2) onStart(name.trim());
+    if (bereit) onStart(name.trim(), nachname.trim());
   }
 
   return (
@@ -37,28 +39,36 @@ export function Start({ onStart, onBack }: { onStart: (name: string) => void; on
         </p>
 
         <form onSubmit={submit} className="mt-8">
-          <label htmlFor="name" className="block text-sm font-medium text-ink">
-            Wie heisst du? (Vorname genügt)
+          <label htmlFor="vorname" className="block text-sm font-medium text-ink">
+            Wie heisst du?
           </label>
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <input
-              id="name"
+              id="vorname"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="z. B. Alex"
+              placeholder="Vorname"
               autoComplete="off"
               className="w-full rounded-full border border-line bg-white px-5 py-3 text-base outline-none ring-green/30 focus:border-green focus:ring-4"
             />
-            <Button type="submit" disabled={name.trim().length < 2} className="shrink-0">
-              Los geht&apos;s →
-            </Button>
+            <input
+              id="nachname"
+              value={nachname}
+              onChange={(e) => setNachname(e.target.value)}
+              placeholder="Nachname"
+              autoComplete="off"
+              className="w-full rounded-full border border-line bg-white px-5 py-3 text-base outline-none ring-green/30 focus:border-green focus:ring-4"
+            />
           </div>
+          <Button type="submit" disabled={!bereit} className="mt-3 w-full sm:w-auto">
+            Los geht&apos;s →
+          </Button>
         </form>
 
         <p className="mt-6 rounded-2xl bg-green-soft px-4 py-3 text-sm leading-relaxed text-green-dark">
           🔒 Deine Daten werden ausschliesslich für die Schnuppertage verwendet und
           anschliessend gelöscht bzw. intern gespeichert. Erfasst werden nur dein
-          Vorname und dein Ergebnis – keine Noten, keine Bewertung.
+          Name und dein Ergebnis – keine Noten, keine Bewertung.
         </p>
       </Card>
 
