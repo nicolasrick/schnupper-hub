@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Teilnehmer, Bewertung, STATIONEN, ladeTeilnehmer, speichereTeilnehmer,
+  Teilnehmer, Bewertung, ladeTeilnehmer, speichereTeilnehmer,
   neuerTeilnehmer, vollerName, formatDatum, leereBewertung, standardArbeiten, schnuppertageRange,
 } from "@/lib/admin";
 import { MODI } from "@/lib/modi";
 import { api } from "@/lib/api";
+import { Einstellungen, DEFAULT_EINSTELLUNGEN } from "@/lib/einstellungen";
 import type { ErgebnisEintrag } from "@/lib/ergebnisse";
 import { Bestaetigung } from "../_components/admin/Bestaetigung";
 import { MailVorlagen } from "../_components/admin/MailVorlagen";
@@ -46,6 +47,7 @@ export default function AdminPage() {
   const [modus, setModusState] = useState("schnuppertag");
   const [abgaben, setAbgaben] = useState<{ key: string; name: string; dateien: { name: string; size: number }[] }[]>([]);
   const [ergebnisse, setErgebnisse] = useState<ErgebnisEintrag[]>([]);
+  const [einstellungen, setEinstellungen] = useState<Einstellungen>(DEFAULT_EINSTELLUNGEN);
 
   function ladeAbgaben() {
     fetch("/api/abgabe/list", { cache: "no-store" })
@@ -86,6 +88,7 @@ export default function AdminPage() {
       }
     })();
     api.getModus().then(setModusState).catch(() => {});
+    api.ladeEinstellungen<Einstellungen>().then(setEinstellungen).catch(() => {});
     ladeAbgaben();
     ladeErgebnisse();
     const iv = setInterval(() => { ladeAbgaben(); ladeErgebnisse(); }, 15000); // live
@@ -202,6 +205,7 @@ export default function AdminPage() {
             <a href="/api/export/zip" className="rounded-full bg-green px-4 py-2 text-sm font-semibold text-white hover:bg-green-dark">⬇ Alles als ZIP</a>
             <button onClick={exportieren} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">⬇ Liste (CSV)</button>
             <button onClick={tagAbschliessen} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">🔒 Tag abschliessen</button>
+            <Link href="/admin/einstellungen" className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">⚙ Einstellungen</Link>
             <Link href="/" className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/20">Hub →</Link>
             <button onClick={abmelden} className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/20 hover:text-white">Abmelden</button>
           </div>
@@ -224,7 +228,7 @@ export default function AdminPage() {
             </div>
           </div>
           <p className="mt-2 text-xs text-white/40">
-            🔒 Datensparsam: Auf dem Server liegen nur der Anlass + kurzlebige Check-Ergebnisse (Vorname + Kennzahlen, Auto-Löschung). Namen, Bericht & Bewertung bleiben <b>lokal auf diesem Gerät</b>. «Tag abschliessen» exportiert lokal & löscht alles Server-seitige.
+            🔒 Auf dem Server: Anlass, Check-Ergebnisse, <b>Teilnehmer & Bewertungen</b> (geräteübergreifend für dich &amp; Gioele). «Tag abschliessen» exportiert lokal &amp; löscht alles Server-seitige.
           </p>
         </div>
 
@@ -344,22 +348,17 @@ export default function AdminPage() {
 
                 <div className="mt-6">
                   <p className="mb-3 text-sm font-semibold text-ink">Bearbeitete Stationen</p>
-                  {([1, 2] as const).map((tag) => (
-                    <div key={tag} className="mb-3">
-                      <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-soft">Tag {tag}</p>
-                      <div className="grid gap-1.5 sm:grid-cols-2">
-                        {STATIONEN.filter((s) => s.tag === tag).map((s) => {
-                          const on = selected.stationen.includes(s.id);
-                          return (
-                            <label key={s.id} className={"flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition " + (on ? "border-green bg-green-soft text-green-dark" : "border-line hover:border-green/40")}>
-                              <input type="checkbox" checked={on} onChange={() => toggleStation(s.id)} className="h-4 w-4 accent-[var(--green)]" />
-                              {s.label}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                  <div className="grid gap-1.5 sm:grid-cols-2">
+                    {einstellungen.stationen.map((s) => {
+                      const on = selected.stationen.includes(s.id);
+                      return (
+                        <label key={s.id} className={"flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition " + (on ? "border-green bg-green-soft text-green-dark" : "border-line hover:border-green/40")}>
+                          <input type="checkbox" checked={on} onChange={() => toggleStation(s.id)} className="h-4 w-4 accent-[var(--green)]" />
+                          {s.label}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -383,13 +382,13 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {selected && modal === "bestaetigung" && <Bestaetigung t={selected} onClose={() => setModal("none")} />}
+      {selected && modal === "bestaetigung" && <Bestaetigung t={selected} einstellungen={einstellungen} onClose={() => setModal("none")} />}
       {selected && modal === "mail" && <MailVorlagen t={selected} onClose={() => setModal("none")} />}
       {selected && modal === "bewertung" && (
-        <Bewertungsbogen t={selected} bewertung={selected.bewertung ?? leereBewertung()} onChange={aktualisiereBewertung} onChangeT={aktualisiere} onClose={() => setModal("none")} />
+        <Bewertungsbogen t={selected} bewertung={selected.bewertung ?? leereBewertung()} einstellungen={einstellungen} onChange={aktualisiereBewertung} onChangeT={aktualisiere} onClose={() => setModal("none")} />
       )}
       {selected && modal === "bericht" && (
-        <Schnupperbericht t={selected} onChange={aktualisiere} onClose={() => setModal("none")} />
+        <Schnupperbericht t={selected} einstellungen={einstellungen} onChange={aktualisiere} onClose={() => setModal("none")} />
       )}
     </main>
   );

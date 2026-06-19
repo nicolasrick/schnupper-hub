@@ -33,4 +33,13 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(liste),
     }),
+
+  // Self-service Konfiguration (Betrieb, Verantwortliche, Stationen, Titel).
+  ladeEinstellungen: <T = unknown>() => j<T>("/api/einstellungen"),
+  speichereEinstellungen: <T = unknown>(e: unknown) =>
+    j<T>("/api/einstellungen", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(e),
+    }),
 };

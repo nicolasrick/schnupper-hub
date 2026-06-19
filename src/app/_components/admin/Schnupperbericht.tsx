@@ -1,14 +1,17 @@
 "use client";
 
-import { Teilnehmer, BEOBACHTUNGEN, generiereBericht, ORGANISATION, formatDatum } from "@/lib/admin";
+import { Teilnehmer, BEOBACHTUNGEN, generiereBericht, formatDatum } from "@/lib/admin";
+import { Einstellungen } from "@/lib/einstellungen";
 
 export function Schnupperbericht({
-  t, onChange, onClose,
+  t, einstellungen, onChange, onClose,
 }: {
   t: Teilnehmer;
+  einstellungen: Einstellungen;
   onChange: (patch: Partial<Teilnehmer>) => void;
   onClose: () => void;
 }) {
+  const o = einstellungen.betrieb;
   const bericht = t.bericht ?? { beobachtungen: [], freitext: "" };
 
   function toggle(id: string) {
@@ -73,11 +76,11 @@ export function Schnupperbericht({
         <div className="flex items-start justify-between border-b-2 border-green pb-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/ids-logo.svg" alt="Informatikdienste Stadt St. Gallen" className="h-12 w-auto" />
-          <p className="text-right text-xs text-ink-soft">{ORGANISATION.ort}, {formatDatum(t.datum)}</p>
+          <p className="text-right text-xs text-ink-soft">{o.ort}, {formatDatum(t.datum)}</p>
         </div>
 
         <h1 className="mt-10 text-3xl font-bold">Schnupperbericht</h1>
-        <p className="mt-1 text-sm text-ink-soft">{ORGANISATION.beruf}</p>
+        <p className="mt-1 text-sm text-ink-soft">{o.beruf}</p>
 
         <div className="mt-8 space-y-4 text-[15px] leading-relaxed">
           {absaetze.map((p, i) => (
@@ -89,9 +92,9 @@ export function Schnupperbericht({
           <div>
             <div className="h-px w-56 bg-ink/40" />
             <p className="mt-1 text-sm">{t.betreuer || "Berufsbildner/in"}</p>
-            <p className="text-xs text-ink-soft">Berufsbildner/in · {ORGANISATION.name}</p>
+            <p className="text-xs text-ink-soft">Berufsbildner/in · {o.name}</p>
           </div>
-          <p className="text-xs text-ink-soft">{ORGANISATION.kontaktMail}</p>
+          <p className="text-xs text-ink-soft">{o.kontaktMail}</p>
         </div>
       </div>
     </div>

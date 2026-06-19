@@ -64,9 +64,14 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/api/teilnehmer") && !authed) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // Einstellungen: Lesen offen (keine Secrets), Ändern nur eingeloggt.
+  if (pathname.startsWith("/api/einstellungen") && req.method !== "GET" && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer", "/api/einstellungen"],
 };

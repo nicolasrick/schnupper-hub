@@ -1,11 +1,11 @@
 "use client";
 
-import {
-  Teilnehmer, STATIONEN, ORGANISATION, vollerName, formatDatum,
-} from "@/lib/admin";
+import { Teilnehmer, vollerName, formatDatum } from "@/lib/admin";
+import { Einstellungen } from "@/lib/einstellungen";
 
-export function Bestaetigung({ t, onClose }: { t: Teilnehmer; onClose: () => void }) {
-  const stationen = STATIONEN.filter((s) => t.stationen.includes(s.id));
+export function Bestaetigung({ t, einstellungen, onClose }: { t: Teilnehmer; einstellungen: Einstellungen; onClose: () => void }) {
+  const o = einstellungen.betrieb;
+  const stationen = einstellungen.stationen.filter((s) => t.stationen.includes(s.id));
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-auto bg-black/70 p-4 sm:p-8">
@@ -31,7 +31,7 @@ export function Bestaetigung({ t, onClose }: { t: Teilnehmer; onClose: () => voi
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/ids-logo.svg" alt="Informatikdienste Stadt St. Gallen" className="h-12 w-auto" />
           <p className="text-right text-xs text-ink-soft">
-            {ORGANISATION.ort}, {formatDatum(t.datum)}
+            {o.ort}, {formatDatum(t.datum)}
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export function Bestaetigung({ t, onClose }: { t: Teilnehmer; onClose: () => voi
         <p className="leading-relaxed">
           {t.schule ? <>({t.schule}) </> : null}
           am <strong>{formatDatum(t.datum)}</strong> einen Schnuppertag im Beruf{" "}
-          <strong>{ORGANISATION.beruf}</strong> bei den {ORGANISATION.name} absolviert hat.
+          <strong>{o.beruf}</strong> bei {o.name} absolviert hat.
         </p>
 
         {stationen.length > 0 && (
@@ -77,9 +77,9 @@ export function Bestaetigung({ t, onClose }: { t: Teilnehmer; onClose: () => voi
           <div>
             <div className="h-px w-56 bg-ink/40" />
             <p className="mt-1 text-sm">{t.betreuer || "Berufsbildner/in"}</p>
-            <p className="text-xs text-ink-soft">Berufsbildner/in · {ORGANISATION.name}</p>
+            <p className="text-xs text-ink-soft">Berufsbildner/in · {o.name}</p>
           </div>
-          <p className="text-xs text-ink-soft">{ORGANISATION.kontaktMail}</p>
+          <p className="text-xs text-ink-soft">{o.kontaktMail}</p>
         </div>
       </div>
     </div>

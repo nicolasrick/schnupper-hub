@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  Teilnehmer, Bewertung, ORGANISATION, formatDatum,
+  Teilnehmer, Bewertung, formatDatum,
   SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN, generiereBegruendung,
   BEOBACHTUNGEN,
 } from "@/lib/admin";
+import { Einstellungen } from "@/lib/einstellungen";
 
 // «gut»-Standard fürs Schnell-Ausfüllen
 const SCHNELL_SKALA: Record<string, string> = {
@@ -14,10 +15,11 @@ const SCHNELL_SKALA: Record<string, string> = {
 };
 
 export function Bewertungsbogen({
-  t, bewertung, onChange, onChangeT, onClose,
+  t, bewertung, einstellungen, onChange, onChangeT, onClose,
 }: {
   t: Teilnehmer;
   bewertung: Bewertung;
+  einstellungen: Einstellungen;
   onChange: (patch: Partial<Bewertung>) => void;
   onChangeT: (patch: Partial<Teilnehmer>) => void;
   onClose: () => void;
@@ -97,7 +99,7 @@ export function Bewertungsbogen({
           <div className="text-right">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sg-green">Beobachten · Beurteilen · Besprechen</p>
             <h1 className="mt-0.5 text-[23px] font-extrabold leading-tight tracking-tight">Auswertung der Schnupperlehre</h1>
-            <p className="text-[11px] text-ink-soft">Informatiker/in Plattformentwicklung EFZ · durch den Betrieb</p>
+            <p className="text-[11px] text-ink-soft">{einstellungen.betrieb.beruf} · durch den Betrieb</p>
           </div>
         </div>
 
@@ -105,8 +107,8 @@ export function Bewertungsbogen({
         <div className="mt-3 grid grid-cols-2 gap-x-6">
           <div>
             <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-sg-green">Betrieb</p>
-            <Row label="Name" value="Informatikdienste Stadt St. Gallen" />
-            <Row label="Adresse" value="Poststrasse 28 · 9000 St. Gallen" />
+            <Row label="Name" value={einstellungen.betrieb.name} />
+            <Row label="Adresse" value={einstellungen.betrieb.adresse} />
             <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
               <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Verantwortlich</span>
               <select
@@ -115,9 +117,12 @@ export function Bewertungsbogen({
                 className="min-w-0 flex-1 cursor-pointer bg-transparent text-[12.5px] font-semibold leading-snug outline-none focus:text-sg-green"
               >
                 <option value="">— wählen —</option>
-                <option value="Nicolas Rick">Nicolas Rick</option>
-                <option value="Gioele Parenti">Gioele Parenti</option>
-                <option value="Nicolas Rick / Gioele Parenti">Nicolas Rick / Gioele Parenti</option>
+                {einstellungen.verantwortliche.map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+                {einstellungen.verantwortliche.length > 1 && (
+                  <option value={einstellungen.verantwortliche.join(" / ")}>{einstellungen.verantwortliche.join(" / ")}</option>
+                )}
               </select>
             </div>
           </div>
@@ -143,7 +148,7 @@ export function Bewertungsbogen({
             </div>
           </div>
         </div>
-        <Row label="Beruf" value={ORGANISATION.beruf} className="mt-0.5" />
+        <Row label="Beruf" value={einstellungen.betrieb.beruf} className="mt-0.5" />
 
         {/* Durchgeführte Arbeiten */}
         <Sech>Folgende Arbeiten hat die/der Jugendliche durchgeführt</Sech>
@@ -257,7 +262,7 @@ export function Bewertungsbogen({
         </div>
 
         <div className="mt-8 flex justify-between border-t border-line pt-2 text-[9px] text-ink-soft">
-          <span>Informatikdienste der Stadt St. Gallen · Auswertung der Schnupperlehre durch den Betrieb</span>
+          <span>{einstellungen.betrieb.name} · Auswertung der Schnupperlehre durch den Betrieb</span>
           <span>interne Beurteilung</span>
         </div>
       </div>
