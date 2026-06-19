@@ -74,11 +74,6 @@ export function Bewertungsbogen({
           </div>
         </div>
 
-        <p className="mt-3 text-[11px] italic leading-relaxed text-ink-soft">
-          Besten Dank, dass die/der Jugendliche bei uns in den Beruf hineinschnuppern durfte. Die folgende
-          Beurteilung beruht auf den Beobachtungen während der Schnupperlehre und wird im Anschluss besprochen.
-        </p>
-
         {/* Betrieb / Jugendliche */}
         <div className="mt-3 grid grid-cols-2 gap-x-6">
           <div>
@@ -100,15 +95,12 @@ export function Bewertungsbogen({
             </div>
             <div className="flex items-baseline gap-2 border-b border-line/70 py-1">
               <span className="w-[80px] shrink-0 text-[10px] font-medium text-ink-soft">Schnuppertag(e)</span>
-              <span className="flex-1 text-[12.5px] font-semibold leading-snug">
-                {formatDatum(t.datum) || "—"}
-                <input
-                  value={bewertung.datumBis}
-                  onChange={(e) => onChange({ datumBis: e.target.value })}
-                  placeholder="bis (optional)"
-                  className="ml-2 w-24 border-b border-line bg-transparent text-[12px] font-normal outline-none focus:border-sg-green"
-                />
-              </span>
+              <input
+                value={bewertung.datumBis}
+                onChange={(e) => onChange({ datumBis: e.target.value })}
+                placeholder={formatDatum(t.datum) || "z. B. 18.–19.06.2026"}
+                className="min-w-0 flex-1 border-b border-line/60 bg-transparent text-[12.5px] font-semibold leading-snug outline-none placeholder:font-normal placeholder:text-ink-soft/60 focus:border-sg-green"
+              />
             </div>
           </div>
         </div>
