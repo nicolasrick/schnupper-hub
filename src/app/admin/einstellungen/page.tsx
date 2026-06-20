@@ -13,6 +13,31 @@ export default function EinstellungenPage() {
   const [geladen, setGeladen] = useState(false);
   const [status, setStatus] = useState<Status>("");
 
+  // Admin-Passwort ändern (eigene Aktion, getrennt vom Speichern).
+  const [pwAktuell, setPwAktuell] = useState("");
+  const [pwNeu, setPwNeu] = useState("");
+  const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [pwBusy, setPwBusy] = useState(false);
+  async function passwortAendern() {
+    setPwBusy(true);
+    setPwMsg(null);
+    try {
+      const res = await api.aendereAdminPasswort(pwAktuell, pwNeu);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setPwMsg({ ok: true, text: "✓ Passwort geändert." });
+        setPwAktuell("");
+        setPwNeu("");
+      } else {
+        setPwMsg({ ok: false, text: data?.message || "Änderung fehlgeschlagen." });
+      }
+    } catch {
+      setPwMsg({ ok: false, text: "Netzwerkfehler." });
+    } finally {
+      setPwBusy(false);
+    }
+  }
+
   useEffect(() => {
     Promise.all([
       api.ladeEinstellungen<Einstellungen>().then((d) => setE(d)).catch(() => {}),
@@ -118,6 +143,22 @@ export default function EinstellungenPage() {
               Diesen Code geben die Schüler/innen auf der Startseite ein. Leer lassen = Gate weiterhin aktiv,
               aber ohne gültigen Code kommt niemand rein. Nach dem Ändern müssen sich alle neu einloggen.
             </p>
+          </Box>
+
+          {/* Admin-Passwort */}
+          <Box titel="Admin-Passwort">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Feld label="Aktuelles Passwort" value={pwAktuell} onChange={setPwAktuell} type="password" />
+              <Feld label="Neues Passwort (min. 6 Zeichen)" value={pwNeu} onChange={setPwNeu} type="password" />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button onClick={passwortAendern} disabled={pwBusy || !pwAktuell || pwNeu.trim().length < 6}
+                className="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-40">
+                {pwBusy ? "Ändert …" : "Passwort ändern"}
+              </button>
+              {pwMsg && <span className={"text-sm font-medium " + (pwMsg.ok ? "text-green" : "text-red-500")}>{pwMsg.text}</span>}
+            </div>
+            <p className="text-xs text-ink-soft">Wird nur als Hash gespeichert (nie im Klartext). Du bleibst eingeloggt.</p>
           </Box>
 
           <div className="flex flex-wrap items-center gap-3">

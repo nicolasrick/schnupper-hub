@@ -51,4 +51,12 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ zugangscode }),
     }),
+
+  // Admin-Passwort ändern (braucht das aktuelle PW). Roh, damit wir Fehlermeldungen lesen.
+  aendereAdminPasswort: (aktuell: string, neu: string) =>
+    fetch("/api/passwort", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ aktuell, neu }),
+    }),
 };

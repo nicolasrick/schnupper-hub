@@ -75,9 +75,14 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/api/zugangscode") && !authed) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // Admin-Passwort ändern nur eingeloggt.
+  if (pathname.startsWith("/api/passwort") && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer", "/api/einstellungen", "/api/zugangscode"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer", "/api/einstellungen", "/api/zugangscode", "/api/passwort"],
 };

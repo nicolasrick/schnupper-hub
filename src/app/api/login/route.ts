@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { ADMIN_PASSWORT, ADMIN_TOKEN, AUTH_COOKIE } from "@/lib/auth";
-import { ipVon, gesperrt, fehlversuch, erfolg, sicherGleich, bremse } from "@/lib/ratelimit";
+import { ADMIN_TOKEN, AUTH_COOKIE } from "@/lib/auth";
+import { pruefeAdminPasswort } from "@/lib/authStore";
+import { ipVon, gesperrt, fehlversuch, erfolg, bremse } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
   }
 
   const { passwort } = await req.json().catch(() => ({ passwort: "" }));
-  if (!sicherGleich(String(passwort ?? ""), ADMIN_PASSWORT)) {
+  if (!(await pruefeAdminPasswort(String(passwort ?? "")))) {
     fehlversuch(key);
     await bremse(); // automatisiertes Raten zusätzlich bremsen
     return NextResponse.json({ ok: false }, { status: 401 });
