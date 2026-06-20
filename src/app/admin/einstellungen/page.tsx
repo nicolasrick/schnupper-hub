@@ -53,14 +53,14 @@ export default function EinstellungenPage() {
     <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-ink">⚙ Einstellungen</h1>
-          <p className="text-sm text-ink-soft">Eigene Daten hinterlegen – ohne Code. Gilt für Bewertung, Bericht & Bestätigung.</p>
+          <h1 className="text-2xl font-bold text-white">⚙ Einstellungen</h1>
+          <p className="text-sm text-white/70">Eigene Daten hinterlegen – ohne Code. Gilt für Bewertung, Bericht &amp; Bestätigung.</p>
         </div>
-        <Link href="/admin" className="rounded-full bg-black/5 px-4 py-2 text-sm font-semibold text-ink hover:bg-black/10">← Dashboard</Link>
+        <Link href="/admin" className="shrink-0 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/20">← Dashboard</Link>
       </div>
 
       {!geladen ? (
-        <p className="text-ink-soft">Lädt …</p>
+        <p className="text-white/70">Lädt …</p>
       ) : (
         <div className="space-y-6">
           {/* Betrieb */}
@@ -114,7 +114,7 @@ export default function EinstellungenPage() {
             </button>
             {status === "ok" && <span className="text-sm font-medium text-green">✓ Gespeichert</span>}
             {status === "fehler" && <span className="text-sm font-medium text-red-500">Fehler beim Speichern</span>}
-            <Link href="/admin" className="ml-auto rounded-full bg-black/5 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-black/10">← Zurück zum Dashboard</Link>
+            <Link href="/admin" className="ml-auto rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/20">← Zurück zum Dashboard</Link>
           </div>
         </div>
       )}
