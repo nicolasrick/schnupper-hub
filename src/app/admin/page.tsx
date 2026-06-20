@@ -48,6 +48,7 @@ export default function AdminPage() {
   const [abgaben, setAbgaben] = useState<{ key: string; name: string; dateien: { name: string; size: number }[] }[]>([]);
   const [ergebnisse, setErgebnisse] = useState<ErgebnisEintrag[]>([]);
   const [einstellungen, setEinstellungen] = useState<Einstellungen>(DEFAULT_EINSTELLUNGEN);
+  const [selectedTag, setSelectedTag] = useState<string>(() => new Date().toISOString().slice(0, 10));
 
   function ladeAbgaben() {
     fetch("/api/abgabe/list", { cache: "no-store" })
@@ -97,6 +98,16 @@ export default function AdminPage() {
 
   const selected = liste.find((t) => t.id === selectedId) ?? null;
 
+  // Überblick pro Tag: nach Datum gruppieren (heute immer dabei), neueste zuerst.
+  const heuteISO = new Date().toISOString().slice(0, 10);
+  const tageMap = new Map<string, number>();
+  for (const t of liste) { const d = t.datum || ""; tageMap.set(d, (tageMap.get(d) || 0) + 1); }
+  if (!tageMap.has(heuteISO)) tageMap.set(heuteISO, 0);
+  const tage = [...tageMap.entries()].map(([datum, count]) => ({ datum, count })).sort((a, b) => b.datum.localeCompare(a.datum));
+  const gefilterteListe = selectedTag === "alle" ? liste : liste.filter((t) => (t.datum || "") === selectedTag);
+  const chip = (on: boolean) =>
+    "rounded-full px-3 py-1.5 text-xs font-medium transition " + (on ? "bg-green text-white" : "bg-black/5 text-ink-soft hover:bg-black/10");
+
   // Schreibt sofort in den lokalen Cache (snappy/offline) + debounced auf den Server (gemeinsam).
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   function persist(next: Teilnehmer[]) {
@@ -125,6 +136,7 @@ export default function AdminPage() {
     const t = neuerTeilnehmer();
     persist([t, ...liste]);
     setSelectedId(t.id);
+    setSelectedTag(t.datum); // neuer Eintrag landet auf heute
   }
 
   function aktualisiere(patch: Partial<Teilnehmer>) {
@@ -140,25 +152,38 @@ export default function AdminPage() {
   }
 
   function exportieren() {
+    const daten = selectedTag === "alle" ? liste : liste.filter((t) => (t.datum || "") === selectedTag);
+    const tagLabel = selectedTag === "alle" ? "alle" : selectedTag;
     const cols = ["Vorname", "Nachname", "E-Mail", "Schule", "Datum", "Anlass", "Stationen", "Bemerkung", "Besprochen"];
-    const rows = liste.map((t) => [
+    const rows = daten.map((t) => [
       t.vorname, t.nachname, t.email, t.schule, t.datum, t.modus || "",
       t.stationen.length, (t.bemerkung || "").replace(/\n/g, " "), t.bewertung?.besprochen || "",
     ]);
     const csv = [cols, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\n");
-    download("schnuppertage_export.csv", "﻿" + csv, "text/csv;charset=utf-8");
-    download("schnuppertage_export.json", JSON.stringify(liste, null, 2), "application/json");
+    download(`schnuppertag_${tagLabel}.csv`, "﻿" + csv, "text/csv;charset=utf-8");
+    download(`schnuppertag_${tagLabel}.json`, JSON.stringify(daten, null, 2), "application/json");
   }
 
+  // Tag abschliessen: exportiert den Tag + räumt die kurzlebigen Server-Daten
+  // (Abgaben + Check-Ergebnisse) weg. Die Teilnehmer-Liste BLEIBT als Überblick.
   async function tagAbschliessen() {
-    if (!window.confirm("Erst exportieren – dann ALLE Daten löschen (gemeinsame Teilnehmer-Liste auf dem Server + alle Abgaben). Fortfahren?")) return;
+    const label = selectedTag === "alle" ? "alle Tage" : formatDatum(selectedTag);
+    if (!window.confirm(`«${label}» exportieren und die heutigen Abgaben + Check-Ergebnisse vom Server löschen?\n\nDie Teilnehmer/Bewertungen bleiben als Überblick erhalten.`)) return;
     exportieren();
-    persist([]);
-    setSelectedId(null);
     try { await fetch("/api/abgabe", { method: "DELETE" }); } catch { /* ignore */ }
     try { await fetch("/api/ergebnis", { method: "DELETE" }); } catch { /* ignore */ }
     setAbgaben([]);
     setErgebnisse([]);
+  }
+
+  // Einen ganzen Tag aus dem Überblick entfernen (endgültig).
+  function tagLoeschen() {
+    if (selectedTag === "alle") return;
+    if (!window.confirm(`Alle Teilnehmer vom ${formatDatum(selectedTag)} endgültig löschen?`)) return;
+    const next = liste.filter((t) => (t.datum || "") !== selectedTag);
+    persist(next);
+    setSelectedId(next[0]?.id ?? null);
+    setSelectedTag(heuteISO);
   }
 
   async function abmelden() {
@@ -175,6 +200,7 @@ export default function AdminPage() {
     const tn: Teilnehmer = { ...neuerTeilnehmer(), vorname: e.vorname, nachname: e.nachname || "", bewertung: { ...leereBewertung(), arbeiten: standardArbeiten(), datumBis: schnuppertageRange() } };
     persist([tn, ...liste]);
     setSelectedId(tn.id);
+    setSelectedTag(tn.datum);
     setModal("bewertung");
   }
   function aktualisiereBewertung(patch: Partial<Bewertung>) {
@@ -304,16 +330,36 @@ export default function AdminPage() {
           )}
         </div>
 
+        {/* Überblick: Schnuppertage */}
+        <div className="mb-4 rounded-3xl bg-surface p-4 shadow-2xl ring-1 ring-black/5">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-ink">📅 Schnuppertage <span className="text-ink-soft">({tage.filter((tg) => tg.count > 0).length})</span></h2>
+            <span className="text-xs text-ink-soft">{liste.length} Teilnehmer gesamt</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => setSelectedTag("alle")} className={chip(selectedTag === "alle")}>Alle · {liste.length}</button>
+            {tage.map((tg) => (
+              <button key={tg.datum || "_ohne"} onClick={() => setSelectedTag(tg.datum)} className={chip(selectedTag === tg.datum)}>
+                {tg.datum ? formatDatum(tg.datum) : "ohne Datum"}{tg.datum === heuteISO ? " · heute" : ""} · {tg.count}
+              </button>
+            ))}
+            {selectedTag !== "alle" && gefilterteListe.length > 0 && (
+              <button onClick={tagLoeschen} title="Diesen Tag aus dem Überblick entfernen" className="ml-auto text-xs text-red-500 hover:text-red-600">🗑 Tag löschen</button>
+            )}
+          </div>
+        </div>
+
         <div className="grid gap-5 md:grid-cols-[300px_1fr]">
           {/* Liste */}
           <div className="rounded-3xl bg-surface p-4 shadow-2xl ring-1 ring-black/5">
-            <div className="mb-2 flex justify-end">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-semibold text-ink-soft">{selectedTag === "alle" ? "Alle Tage" : formatDatum(selectedTag)} · {gefilterteListe.length}</span>
               <button onClick={aktualisiereListe} title="Stand vom Server / anderen Gerät laden" className="text-xs text-ink-soft hover:text-ink">↻ Aktualisieren</button>
             </div>
             <button onClick={anlegen} className="w-full rounded-2xl bg-green px-4 py-3 text-sm font-semibold text-white hover:bg-green-dark">+ Neue:r Teilnehmer:in</button>
             <div className="mt-3 space-y-1.5">
-              {liste.length === 0 && <p className="px-2 py-6 text-center text-sm text-ink-soft">Noch niemand erfasst.</p>}
-              {liste.map((t) => (
+              {gefilterteListe.length === 0 && <p className="px-2 py-6 text-center text-sm text-ink-soft">Für diesen Tag noch niemand erfasst.</p>}
+              {gefilterteListe.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setSelectedId(t.id)}
