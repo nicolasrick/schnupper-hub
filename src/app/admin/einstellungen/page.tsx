@@ -107,13 +107,14 @@ export default function EinstellungenPage() {
             <button onClick={addStation} className="mt-2 text-sm font-medium text-green hover:text-green-dark">+ Station hinzufügen</button>
           </Box>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button onClick={speichern} disabled={status === "speichern"}
               className="rounded-full bg-green px-6 py-2.5 text-sm font-semibold text-white hover:bg-green-dark disabled:opacity-50">
               {status === "speichern" ? "Speichert …" : "Speichern"}
             </button>
             {status === "ok" && <span className="text-sm font-medium text-green">✓ Gespeichert</span>}
             {status === "fehler" && <span className="text-sm font-medium text-red-500">Fehler beim Speichern</span>}
+            <Link href="/admin" className="ml-auto rounded-full bg-black/5 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-black/10">← Zurück zum Dashboard</Link>
           </div>
         </div>
       )}
