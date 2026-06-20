@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { AUTH_COOKIE, ADMIN_TOKEN } from "@/lib/auth";
+import { AUTH_COOKIE, ADMIN_TOKEN, ZUGANG_COOKIE, ZUGANG_TOKEN } from "@/lib/auth";
 
 // Schützt das Dashboard (UI) und das Setzen des Modus.
 // Personendaten gibt es serverseitig nicht – darum nur diese zwei Dinge.
@@ -7,11 +7,12 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const authed = req.cookies.get(AUTH_COOKIE)?.value === ADMIN_TOKEN;
 
-  // Zugangscode-Gate für die Teilnehmer-Startseite (nur wenn ZUGANGSCODE gesetzt).
-  // Verhindert, dass die URL einfach weitergegeben wird.
-  const zugangscode = process.env.ZUGANGSCODE || "";
-  if (zugangscode && pathname === "/") {
-    const hatZugang = req.cookies.get("sh_access")?.value === zugangscode;
+  // Zugangscode-Gate für die Teilnehmer-Startseite (aktiv, solange ZUGANGSCODE als
+  // Flag gesetzt ist). Der echte Code ist im Admin änderbar (Server-Store); das
+  // Cookie trägt nur den Token, darum prüft die Edge-Middleware gegen ZUGANG_TOKEN.
+  const gateAktiv = !!(process.env.ZUGANGSCODE || "");
+  if (gateAktiv && pathname === "/") {
+    const hatZugang = req.cookies.get(ZUGANG_COOKIE)?.value === ZUGANG_TOKEN;
     if (!hatZugang) {
       const url = req.nextUrl.clone();
       url.pathname = "/zugang";
@@ -69,9 +70,14 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/api/einstellungen") && req.method !== "GET" && !authed) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // Schüler-Zugangscode (Geheimnis): Lesen UND Ändern nur eingeloggt.
+  if (pathname.startsWith("/api/zugangscode") && !authed) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer", "/api/einstellungen"],
+  matcher: ["/", "/admin", "/admin/:path*", "/api/config", "/api/abgabe", "/api/abgabe/:path*", "/api/ergebnis", "/api/export/:path*", "/api/umformulieren", "/api/teilnehmer", "/api/einstellungen", "/api/zugangscode"],
 };

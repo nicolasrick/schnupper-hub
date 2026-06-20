@@ -9,14 +9,15 @@ type Status = "" | "speichern" | "ok" | "fehler";
 
 export default function EinstellungenPage() {
   const [e, setE] = useState<Einstellungen>(DEFAULT_EINSTELLUNGEN);
+  const [zugangscode, setZugangscode] = useState("");
   const [geladen, setGeladen] = useState(false);
   const [status, setStatus] = useState<Status>("");
 
   useEffect(() => {
-    api.ladeEinstellungen<Einstellungen>()
-      .then((d) => setE(d))
-      .catch(() => {})
-      .finally(() => setGeladen(true));
+    Promise.all([
+      api.ladeEinstellungen<Einstellungen>().then((d) => setE(d)).catch(() => {}),
+      api.ladeZugangscode().then((c) => setZugangscode(c)).catch(() => {}),
+    ]).finally(() => setGeladen(true));
   }, []);
 
   const setBetrieb = (patch: Partial<Einstellungen["betrieb"]>) =>
@@ -25,7 +26,10 @@ export default function EinstellungenPage() {
   async function speichern() {
     setStatus("speichern");
     try {
-      const gespeichert = await api.speichereEinstellungen<Einstellungen>(e);
+      const [gespeichert] = await Promise.all([
+        api.speichereEinstellungen<Einstellungen>(e),
+        api.speichereZugangscode(zugangscode),
+      ]);
       setE(gespeichert);
       setStatus("ok");
       setTimeout(() => setStatus(""), 2500);
@@ -105,6 +109,15 @@ export default function EinstellungenPage() {
               ))}
             </div>
             <button onClick={addStation} className="mt-2 text-sm font-medium text-green hover:text-green-dark">+ Station hinzufügen</button>
+          </Box>
+
+          {/* Schüler-Login */}
+          <Box titel="Schüler-Login (Zugangscode)">
+            <Feld label="Code für die Teilnehmer-Startseite" value={zugangscode} onChange={setZugangscode} />
+            <p className="text-xs text-ink-soft">
+              Diesen Code geben die Schüler/innen auf der Startseite ein. Leer lassen = Gate weiterhin aktiv,
+              aber ohne gültigen Code kommt niemand rein. Nach dem Ändern müssen sich alle neu einloggen.
+            </p>
           </Box>
 
           <div className="flex flex-wrap items-center gap-3">

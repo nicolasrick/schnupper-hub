@@ -42,4 +42,13 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(e),
     }),
+
+  // Schüler-Zugangscode (admin-only, getrennt vom öffentlichen Config-GET).
+  ladeZugangscode: () => j<{ zugangscode: string }>("/api/zugangscode").then((d) => d.zugangscode),
+  speichereZugangscode: (zugangscode: string) =>
+    j<{ ok: boolean; zugangscode: string }>("/api/zugangscode", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ zugangscode }),
+    }),
 };
