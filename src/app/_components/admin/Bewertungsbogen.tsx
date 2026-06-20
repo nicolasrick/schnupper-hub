@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  Teilnehmer, Bewertung, formatDatum,
+  Teilnehmer, Bewertung, formatDatum, schnuppertage,
   SKALA_FRAGEN, EIGNUNG_KRITERIEN, EIGNUNG_STUFEN, generiereBegruendung,
   BEOBACHTUNGEN,
 } from "@/lib/admin";
@@ -145,6 +145,10 @@ export function Bewertungsbogen({
                 placeholder={formatDatum(t.datum) || "z. B. 19.06.2026"}
                 className="min-w-0 flex-1 border-b border-line/60 bg-transparent text-[12.5px] font-semibold leading-snug outline-none placeholder:font-normal placeholder:text-ink-soft/60 focus:border-sg-green"
               />
+            </div>
+            <div className="no-print mt-1 flex gap-1.5 pl-[88px]">
+              <button onClick={() => onChange({ datumBis: schnuppertage(1) })} className="rounded-full border border-line px-2 py-0.5 text-[10px] font-medium text-ink-soft hover:border-sg-green hover:text-sg-green">Heute</button>
+              <button onClick={() => onChange({ datumBis: schnuppertage(2) })} className="rounded-full border border-line px-2 py-0.5 text-[10px] font-medium text-ink-soft hover:border-sg-green hover:text-sg-green">Gestern + heute</button>
             </div>
           </div>
         </div>

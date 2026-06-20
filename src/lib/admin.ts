@@ -114,11 +114,22 @@ export function formatDatum(iso: string): string {
   return d && m && y ? `${d}.${m}.${y}` : iso;
 }
 
-/** Standard-Schnuppertag: heute (1-Tag-Event, Vormittag/Nachmittag). Frei editierbar im Bogen. */
-export function schnuppertageRange(): string {
-  const heute = new Date();
+/** Schnuppertag(e): 1 Tag = heute, 2 Tage = gestern–heute (z.B. «18.–19.06.2026»). */
+export function schnuppertage(tage: 1 | 2 = 1): string {
   const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(heute.getDate())}.${p(heute.getMonth() + 1)}.${heute.getFullYear()}`;
+  const heute = new Date();
+  const fmt = (d: Date) => `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+  if (tage <= 1) return fmt(heute);
+  const gestern = new Date(heute.getTime() - 86_400_000);
+  const gleicherMonat = gestern.getMonth() === heute.getMonth() && gestern.getFullYear() === heute.getFullYear();
+  return gleicherMonat
+    ? `${p(gestern.getDate())}.–${p(heute.getDate())}.${p(heute.getMonth() + 1)}.${heute.getFullYear()}`
+    : `${fmt(gestern)}–${fmt(heute)}`;
+}
+
+/** Auto-Default beim Anlegen: 1 Tag (heute). Im Bogen frei änderbar. */
+export function schnuppertageRange(): string {
+  return schnuppertage(1);
 }
 
 // --- Mailvorlagen ------------------------------------------------------------
